@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Highlight Rows</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+		
+		th, td {
+			text-align: left;
+			padding: 8px;
+			border-bottom: 1px solid #ddd;
+		}
+		
+		tr:hover {
+			background-color: #f5f5f5;
+		}
+		
+		.highlight {
+			background-color: yellow;
+		}
+	</style>
+</head>
+<body>
+
+	<h2>Table 1</h2>
+	<table id="table1">
+		<thead>
+			<tr>
+				<th>Value 1</th>
+				<th>Value 2</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>A</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>B</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>C</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<h2>Table 2</h2>
+	<table id="table2">
+		<thead>
+			<tr>
+				<th>Value 1</th>
+				<th>Value 2</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>X</td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>Y</td>
+				<td>2</td>
+			</tr>
+			<tr>
+				<td>Z</td>
+				<td>3</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<button id="backButton">Back</button>
+	<button id="nextButton">Next</button>
+	
+	<script>
+		var map = {
+			1: 1,
+			2: 2,
+			3: 3
+		};
+		
+		var table1 = document.getElementById("table1");
+		var table2 = document.getElementById("table2");
+		var rows1 = table1.getElementsByTagName("tr");
+		var rows2 = table2.getElementsByTagName("tr");
+		var currentRow = 0;
+		
+		function highlightRows() {
+			// Remove highlight from previous rows
+			rows1[currentRow].classList.remove("highlight");
+			rows2[map[currentRow+1]-1].classList.remove("highlight");
+			
+			// Highlight new rows
+			rows1[currentRow+1].classList.add("highlight");
+			rows2[map[currentRow+2]-1].classList.add("highlight");
+		}
+		
+		document.getElementById("backButton").addEventListener("click", function() {
+			if (currentRow > 0) {
+				currentRow--;
+				highlightRows();
+			}
+		});
+		
+		document.getElementById("nextButton").addEventListener("click", function() {
+			if (currentRow < rows1.length-2) {
+				currentRow++;
+				highlightRows();
+			}
+		});
+		
+		highlightRows(); // Highlight initial rows
+	</script>
+	
+</body>
+</html>

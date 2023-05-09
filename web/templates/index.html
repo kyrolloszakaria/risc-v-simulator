@@ -1,0 +1,98 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>My Flask App</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <h1>Welcome to the RISC V simulator</h1>
+        <form method="POST" action="{{ url_for('submit') }}">
+            <label for="firstAddress">Please, enter the address of the first instruction as positive decimal integer:</label>
+            <input type="number" name="firstAddress" id="firstAddress" required><br>
+
+            <label>Do you want to initialize the memory with file?</label>
+            <input type="radio" name="mem_init" value="yes">Yes<br>
+            <input type="radio" name="mem_init" value="no" checked>No<br>
+            <div id="mem_part">
+                <label>The format of memory file should be on form 'address value' without quotations</label>
+                <input type="radio" name="mem_option" value="text" checked>Enter a text<br>
+                <input type="radio" name="mem_option" value="file"> Upload a file (must be text file) <br><br>
+                <div id="mem_input">
+                    <label>Initial Memory values:</label>
+                    <input type="text" id="data_txt" name="mem_text" required><br>
+                </div>
+            </div>
+            
+            <br>  
+            <label>How do you want to enter your Assembly code?</label><br>
+            <input type="radio" name="code_option" value="text" checked>Source code text<br>
+            <input type="radio" name="code_option" value="file"> Upload code file (must be text file) <br><br>
+            <div id="code_input">
+                <label>Source code: </label>
+                <input type="text" id="code_txt" name="code_txt" required><br>
+            </div>
+            <br>
+
+            <label for="format">Which format do you want the output in? Choose 'd' for decimal, 'h' for hexadecimal, 'b' for binary</label>
+            <input type="radio" name="format" id="format" value="d"checked>d<br>
+            <input type="radio" name="format" id="format" value="h"checked>h<br>
+            <input type="radio" name="format" id="format" value="b"checked>b<br>
+
+            <input type="submit" value="Submit">
+        </form>
+
+        <script>
+
+            document.querySelectorAll('input[name="code_option"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    var codeOption = this.value;
+                    var codeInput = document.getElementById('code_input');
+                    if (codeOption == 'file') {
+                        codeInput.innerHTML = '<input type="file" name="code_file" required><br>';
+                    } else {
+                        codeInput.innerHTML = '<label>source code:</label>'
+                        codeInput.innerHTML += '<input type="text" id="code_txt" name="code_txt" required>';
+                    }
+                });
+            });
+
+            document.querySelectorAll('input[name="mem_option"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    var memOption = this.value;
+                    var memInput = document.getElementById('mem_input');
+                    if (memOption == 'file') {
+                        memInput.innerHTML = '<input type="file" name="mem_file" required><br>';
+                    } else {
+                        memInput.innerHTML = '<label>source mem:</label>'
+                        memInput.innerHTML += '<input type="text" id="mem_txt" name="mem" required>';
+                    }
+                });
+            });
+
+            
+            document.querySelectorAll('input[name="mem_init"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    var memPartOption = this.value;
+                    var memPartInput = document.getElementById('mem_part');
+                    if (memPartOption == 'yes') {
+                        memPartInput.classList.remove("hidden");
+                    } else {
+                        memPartInput.classList.add("hidden");
+                    }
+
+                });
+            });
+
+            document.querySelectorAll('input[name="format"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    var format = this.value;
+                });
+            });
+            
+
+
+
+        </script>
+    </body>
+    </html>

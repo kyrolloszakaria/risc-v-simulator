@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hover Example</title>
+	<style>
+		table {
+			border-collapse: collapse;
+		}
+
+		td {
+			border: 1px solid black;
+			padding: 10px;
+		}
+
+		.highlight {
+			background-color: yellow;
+		}
+	</style>
+</head>
+<body>
+    <button id="back-button">Back</button>
+    <button id="next-button">Next</button>
+	<table>
+		<tr>
+			<td>Value 1</td>
+			<td>Value 2</td>
+			<td>Value 3</td>
+		</tr>
+		<tr>
+			<td>10</td>
+			<td>20</td>
+			<td>30</td>
+		</tr>
+		<tr>
+			<td>40</td>
+			<td>50</td>
+			<td>60</td>
+		</tr>
+		<tr>
+			<td>70</td>
+			<td>80</td>
+			<td>90</td>
+		</tr>
+	</table>
+
+	<table>
+		<tr>
+			<td>Value 1</td>
+			<td>Value 2</td>
+			<td>Value 3</td>
+		</tr>
+		<tr>
+			<td>---</td>
+			<td>---</td>
+			<td>---</td>
+		</tr>
+		<tr>
+			<td>---</td>
+			<td>---</td>
+			<td>---</td>
+		</tr>
+		<tr>
+			<td>---</td>
+			<td>---</td>
+			<td>---</td>
+		</tr>
+	</table>
+
+	<script>
+		const tableData = {
+			'10': 'A',
+			'20': 'B',
+			'30': 'C',
+			'40': 'D',
+			'50': 'E',
+			'60': 'F',
+			'70': 'G',
+			'80': 'H',
+			'90': 'I',
+		};
+
+		const firstTableRows = document.querySelectorAll('table:first-of-type tr');
+		const secondTableRows = document.querySelectorAll('table:last-of-type tr');
+        const backBtn = document.getElementById('back-button');
+        const nextBtn = document.getElementById('next-button');
+        let currentIndex = -1;
+        
+		for (let i = 1; i < firstTableRows.length; i++) {
+			const firstTableData = firstTableRows[i].querySelectorAll('td');
+			const secondTableData = secondTableRows[i].querySelectorAll('td');
+
+			for (let j = 0; j < firstTableData.length; j++) {
+				const value = firstTableData[j].innerText;
+				secondTableData[j].innerText = tableData[value] || '---';
+
+				firstTableData[j].addEventListener('mouseover', () => {
+					secondTableData[j].classList.add('highlight');
+				});
+
+				firstTableData[j].addEventListener('mouseout', () => {
+					secondTableData[j].classList.remove('highlight');
+				});
+			}
+		}
+        
+        const highlightCell = (rowIndex, cellIndex) => {
+        // Remove highlight from previous cell
+        const previousCell = table1.rows[currentIndex].cells[cellIndex];
+        previousCell.classList.remove('highlight');
+
+        // Add highlight to current cell
+        const currentCell = table1.rows[rowIndex].cells[cellIndex];
+        currentCell.classList.add('highlight');
+
+        // Update corresponding cell in table 2
+        const valueCell = table2.rows[0].cells[cellIndex];
+        valueCell.innerText = currentCell.innerText;
+
+        // Update current index
+        currentIndex = rowIndex;
+      };
+
+      const handleBack = () => {
+        if (currentIndex > 0) {
+          highlightCell(currentIndex - 1, 0);
+        }
+      };
+
+      const handleNext = () => {
+        if (currentIndex < table1.rows.length - 1) {
+          highlightCell(currentIndex + 1, 0);
+        }
+      };
+
+      backBtn.addEventListener('click', handleBack);
+      nextBtn.addEventListener('click', handleNext);
+
+      // Highlight first cell on page load
+      highlightCell(0, 0);
+	</script>
+</body>
+</html>

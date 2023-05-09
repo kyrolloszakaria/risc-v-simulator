@@ -1,0 +1,109 @@
+PC is 800
+Executing Instruction addi s2, zero, 5
+Memory is free
+Registers values
+Register x0 : 0
+Register x1 : 0
+Register x2 : 0
+Register x3 : 0
+Register x4 : 0
+Register x5 : 0
+Register x6 : 0
+Register x7 : 0
+Register x8 : 0
+Register x9 : 0
+Register x10 : 0
+Register x11 : 0
+Register x12 : 0
+Register x13 : 0
+Register x14 : 0
+Register x15 : 0
+Register x16 : 0
+Register x17 : 0
+Register x18 : 5
+Register x19 : 0
+Register x20 : 0
+Register x21 : 0
+Register x22 : 0
+Register x23 : 0
+Register x24 : 0
+Register x25 : 0
+Register x26 : 0
+Register x27 : 0
+Register x28 : 0
+Register x29 : 0
+Register x30 : 0
+Register x31 : 0
+PC is 804
+Executing Instruction addi t0,t0,1
+Memory is free
+Registers values
+Register x0 : 0
+Register x1 : 0
+Register x2 : 0
+Register x3 : 0
+Register x4 : 0
+Register x5 : 1
+Register x6 : 0
+Register x7 : 9
+Register x8 : 0
+Register x9 : 0
+Register x10 : 0
+Register x11 : 0
+Register x12 : 0
+Register x13 : 0
+Register x14 : 0
+Register x15 : 0
+Register x16 : 0
+Register x17 : 0
+Register x18 : 8
+Register x19 : 4
+Register x20 : 0
+Register x21 : 0
+Register x22 : 0
+Register x23 : 0
+Register x24 : 0
+Register x25 : 0
+Register x26 : 0
+Register x27 : 0
+Register x28 : -4
+Register x29 : 0
+Register x30 : 0
+Register x31 : 0
+PC is 864
+Executing Instruction bne s2,zero, EXIT
+Memory is free
+Registers values
+Register x0 : 0
+Register x1 : 0
+Register x2 : 0
+Register x3 : 0
+Register x4 : 0
+Register x5 : 1
+Register x6 : 0
+Register x7 : 9
+Register x8 : 0
+Register x9 : 0
+Register x10 : 0
+Register x11 : 0
+Register x12 : 0
+Register x13 : 0
+Register x14 : 0
+Register x15 : 0
+Register x16 : 0
+Register x17 : 0
+Register x18 : 8
+Register x19 : 4
+Register x20 : 0
+Register x21 : 0
+Register x22 : 0
+Register x23 : 0
+Register x24 : 0
+Register x25 : 0
+Register x26 : 0
+Register x27 : 0
+Register x28 : -4
+Register x29 : 0
+Register x30 : 0
+Register x31 : 0
+Yaaaaay. Your program has finished executing.

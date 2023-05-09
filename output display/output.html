@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Two Tables</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			margin: 20px;
+		}
+
+		th, td {
+			border: 1px solid black;
+			padding: 10px;
+		}
+
+		.table1 td:hover {
+			background-color: yellow;
+			cursor: pointer;
+		}
+
+		.table2 td {
+			background-color: lightblue;
+		}
+        .highlight {
+			background-color: yellow;
+		}
+        .my-button {
+            background-color: #4CAF50; /* Green background */
+            border: none; /* Remove border */
+            color: white; /* White text */
+            padding: 15px 32px; /* Padding */
+            text-align: center; /* Center text */
+            text-decoration: none; /* Remove underline */
+            display: inline-block; /* Make it an inline element */
+            font-size: 16px; /* Font size */
+            margin: 4px 2px; /* Margin */
+            cursor: pointer; /* Add pointer cursor on hover */
+}
+
+	</style>
+</head>
+<body>
+    <button class="my-button" id="back-button">Back</button>
+    <button class="my-button" id="next-button">Next</button>
+	<h2>Table 1</h2>
+	<table class="table1">
+		<tr>
+			<th>Column 1</th>
+			<th>Column 2</th>
+			<th>Column 3</th>
+		</tr>
+		<tr>
+			<td>Row 1, Column 1</td>
+			<td>Row 1, Column 2</td>
+			<td>Row 1, Column 3</td>
+		</tr>
+		<tr>
+			<td>Row 2, Column 1</td>
+			<td>Row 2, Column 2</td>
+			<td>Row 2, Column 3</td>
+		</tr>
+	</table>
+
+	<h2>Table 2</h2>
+	<table class="table2">
+		<tr>
+			<th>Column 1</th>
+			<th>Column 2</th>
+			<th>Column 3</th>
+		</tr>
+		<tr>
+			<td>Row 1, Column 1</td>
+				<td>Row 1, Column 2</td>
+			<td>Row 1, Column 3</td>
+		</tr>
+		<tr>
+			<td>Row 2, Column 1</td>
+			<td>Row 2, Column 2</td>
+			<td>Row 2, Column 3</td>
+		</tr>
+	</table>
+
+	<script>
+        const table1 = document.querySelector('.table1');
+        const table2 = document.querySelector('.table2');
+
+
+		let table1Cells = document.querySelectorAll('.table1 td');
+		let table2Cells = document.querySelectorAll('.table2 td');
+
+        const backBtn = document.getElementById('back-button');
+        const nextBtn = document.getElementById('next-button');
+        let currentIndex = -1;
+        let originalText = ''
+        const highlightCell = (rowIndex, cellIndex) => {
+        // Remove highlight from previous cell
+        const previousCell = table1.rows[currentIndex].cells[cellIndex];
+        previousCell.classList.remove('highlight');
+
+        // Add highlight to current cell
+        const currentCell = table1.rows[rowIndex].cells[cellIndex];
+        currentCell.classList.add('highlight');
+
+        // Update corresponding cell in table 2
+        const valueCell = table2.rows[0].cells[cellIndex];
+        valueCell.innerText = currentCell.innerText;
+
+        // Update current index
+        currentIndex = rowIndex;
+      };
+
+      const handleBack = () => {
+        if (currentIndex > 0) {
+          highlightCell(currentIndex - 1, 0);
+        }
+      };
+
+      const handleNext = () => {
+        if (currentIndex < table1.rows.length - 1) {
+          highlightCell(currentIndex + 1, 0);
+        }
+      };
+
+      backBtn.addEventListener('click', handleBack);
+      nextBtn.addEventListener('click', handleNext);
+
+      // Highlight first cell on page load
+      highlightCell(0, 0);
+
+		table1Cells.forEach(function(cell, index) {
+			cell.addEventListener('mouseover', function() {
+				table2Cells[index].style.backgroundColor = 'lightgreen';
+                cell.textContent = 'New value';
+			});
+
+			cell.addEventListener('mouseout', function() {
+				table2Cells[index].style.backgroundColor = 'lightblue';
+                cell.textContent = originalText;
+			});
+		});
+	</script>
+
+</body>
+</html>

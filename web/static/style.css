@@ -1,0 +1,54 @@
+body {
+    background-color: #F8F8FF;
+  }
+  h1{
+    color: #4169E1;
+  }
+  form {
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid #4169E1;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 10px #4169E1;
+  }
+  
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #4169E1;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+  }
+  
+  input[type="submit"] {
+    background-color: #4169E1;
+    color: #FFFFFF;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #FFFFFF;
+    color: #4169E1;
+    border: 2px solid #4169E1;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  div {
+    margin-bottom: 10px;
+  }
+
+  .hidden{
+    display: none;
+  }
+  
