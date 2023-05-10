@@ -11,8 +11,8 @@ app = Flask(__name__)
 
 @app.route('/error')
 def display_error():
-    error_message_1 = "All memory addresses given should be aligned and divisible by 4"
-    error_message_2 = "Please correct the initial memory values and try again."
+    error_message_1 = request.args.get('error_1')
+    error_message_2 = request.args.get('error_2')
     return render_template('error.html', error_message_1=error_message_1,error_message_2=error_message_2)
 
 def validate_memoryFormat():
@@ -32,6 +32,11 @@ def validate_memoryFormat():
         logging.info('memory correct')
 
 
+def validate_assemblyCode():
+    with open('errorMessages.txt', 'r') as f:
+        for line in f:
+            errorMsg = line
+    return errorMsg
 
 
 def display_file():
@@ -61,10 +66,12 @@ def submit():
             with open("Memory.txt", 'w') as ff:
                 # it may require data processing
                 ff.write(mem_value)
-    try:
-        validate_memoryFormat()
-    except ValueError as e:
-        return redirect('/error')
+        try:
+            validate_memoryFormat()
+        except ValueError as e:
+            return redirect(url_for('display_error', 
+                            error_1 = "All memory addresses given should be aligned and divisible by 4",
+                            error_2 = "Please correct the initial memory values and try again."))
     if code_option == "text":
         code_txt = request.form["code_txt"]
         with open("assemblyCode.txt", 'w') as fff:
@@ -81,10 +88,14 @@ def submit():
         f.write(format) # outputForm
 
     # Run the compiled program and wait for it to finish
-    # process = subprocess.Popen('./a')
+    process = subprocess.Popen('./a')
     logging.info('Running C++ program')
-    # process.wait()
+    process.wait()
     logging.info("c++ program ran successfully")
+    # check for errors:
+    if validate_assemblyCode() != '':
+        logging.info('error in assembly code')
+        return redirect(url_for('display_error', error_1 = validate_assemblyCode(), error_2 = ''))
     # # Redirect to output_table.html
     return redirect('/output')
 
