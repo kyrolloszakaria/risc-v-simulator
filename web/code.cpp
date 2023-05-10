@@ -33,6 +33,8 @@ map<string, unsigned int> labelToAddress; // we assume labels are case sensitive
 int registers[32] = {}; //registers initialized to zero
 unsigned int PC = 0; // Max PC is 2^32-1 = 4294967295
 ifstream file;
+ofstream outFile;
+ofstream errorFile;
 
 //Utility Funciton
 bool validFirstAddress();
@@ -108,7 +110,10 @@ void bgeu (int rs1, int rs2, string label);
 void bgeu (int rs1, int rs2,int offset);
 
 int main() {
-    ifstream file("data.txt"); 
+    file.open("data.txt");
+    outFile.open("output.txt");
+    errorFile.open("errorMessages.txt");
+
     // initialize the first address
     int faddr;
     file >> faddr;
@@ -138,35 +143,22 @@ int main() {
         // Address1 val1
         // Address2 val2 ...
         while(file>>address){
-            if(address %4){ //we make the assumtion that all memory addresses given by user is divisible by 4
-                            // for an easier loading and to make sure data is not written on top of each other
-                // TODO: send error messages from C++ to webpage OR check in python file before running the cpp file
-                cout<<"All memory addresses given should be aligned and divisible by 4\n";
-                cout<<"Change the memory addresses. The program will terminate";
-                system("pause");
-                exit(1);
-            }
             file >> val;
             memory[address] = val;
         }
         // for (auto it: memory){
         //     cout<<it.first<<" "<<it.second<<"\n";
         // }
-        file.close();
+        
     }
+    string outputForm; // format
+    file >>outputForm;
+    file.close();
+
     // cout << "Enter the assembly code file name with the extension. The file should be in the current direcory.\n";
     openFile("assemblyCode.txt");
     mapInstructionsAndLabels();
 
-    string outputForm;
-    cout<<"Which format do you want the output in? Enter 'd' for decimal, 'h' for hexadecimal, 'b' for binary without quotaions\n";
-    cin>>outputForm;
-    while(outputForm!="d" && outputForm!="D" && outputForm!="H" && outputForm!="h" && outputForm!="b" && outputForm!="B"){
-        cout<<"The format you entered is not correct. Please enter a correct one\n";
-        cin>>outputForm;
-    }
-
-  
     //instruction word itslef is case insensitive
     while (lower(addressToInsruction[PC].substr(0, 5)) != "fence" && lower(addressToInsruction[PC]).substr(0,5) != "ecall"
      && lower(addressToInsruction[PC]).substr(0,6) != "ebreak") {
@@ -318,22 +310,19 @@ void mapInstructionsAndLabels(){
                 strip(possibleInst);
                 // validate that the label does not exist
                 if(labelToAddress.find(label) != labelToAddress.end()){//Lables are case snestitive according to RARS
-                    cout<<"Labels must be unique. The program will terminate\n";
-                    system("pause");
+                    errorFile << "Labels must be unique. The program will terminate\n";
                     exit(1);
                 }
                 if(isdigit(label[0])){ //We assume that labels do not start with integers as in RARS 
                     //That will help us parse J and B type instrucitons, and that is what RARS does
-                    cout<<"Labels can not start with integers. The program will terminate\n";
-                    system("pause");
+                    errorFile <<"Labels can not start with integers. The program will terminate\n";
                     exit(1);
                 }
                 labelToAddress[label] = tmpPC;
                 if(possibleInst.size()>1){
                     addressToInsruction[tmpPC] = possibleInst;
                     if (tmpPC > maxPC-4) {
-                        cout<<"You entered too many instructions. The program will terminate\n";
-                        system("pause");
+                        errorFile <<"You entered too many instructions. The program will terminate\n";
                         exit(1);
                     }
                     tmpPC+=4;
@@ -342,8 +331,7 @@ void mapInstructionsAndLabels(){
             else if (Line.size()>1){
                 addressToInsruction[tmpPC] = Line;
                 if (tmpPC > maxPC-4) {
-                    cout<<"You entered too many instructions. The program will terminate\n";
-                    system("pause");
+                    errorFile <<"You entered too many instructions. The program will terminate\n";
                     exit(1);
                 }
                 tmpPC+=4;
