@@ -4,3 +4,6 @@ a.exe
 simulator.exe
 
 web/app.log
+web/assemblyCode.txt
+web/data.txt
+web/Memory.txt
