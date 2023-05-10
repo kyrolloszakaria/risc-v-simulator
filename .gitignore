@@ -7,3 +7,5 @@ web/app.log
 web/assemblyCode.txt
 web/data.txt
 web/Memory.txt
+web/errorMessages.txt
+web/output.txt
