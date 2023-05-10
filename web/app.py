@@ -1,13 +1,38 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, make_response
 import subprocess
 import logging
 
-# Configure logging
+
 logging.basicConfig(filename='app.log', level=logging.INFO)
 
 
-
 app = Flask(__name__)
+
+
+@app.route('/error')
+def display_error():
+    error_message_1 = "All memory addresses given should be aligned and divisible by 4"
+    error_message_2 = "Please correct the initial memory values and try again."
+    return render_template('error.html', error_message_1=error_message_1,error_message_2=error_message_2)
+
+def validate_memoryFormat():
+    logging.info('entered')
+    memory = {}
+    with open("Memory.txt", 'r') as file:
+        for line in file:
+            try:
+                address, val = line.split()
+                address = int(address)
+                val = int(val)
+                if address % 4 != 0:
+                    logging.info('memory wrong')
+                    raise ValueError("Memory address is not divisible by 4")
+            except ValueError:
+                raise ValueError("Memory address is not divisible by 4")
+        logging.info('memory correct')
+
+
+
 
 def display_file():
     with open('small_output.txt', 'r') as f:
@@ -36,6 +61,10 @@ def submit():
             with open("Memory.txt", 'w') as ff:
                 # it may require data processing
                 ff.write(mem_value)
+    try:
+        validate_memoryFormat()
+    except ValueError as e:
+        return redirect('/error')
     if code_option == "text":
         code_txt = request.form["code_txt"]
         with open("assemblyCode.txt", 'w') as fff:

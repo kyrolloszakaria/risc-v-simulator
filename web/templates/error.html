@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Error !!</title>
+</head>
+<body>
+  <div class="container">
+    <h1>{{ error_message_1 }}</h1>
+    <p>{{ error_message_2 }}</p>
+    <button class="btn" onclick="window.history.back()">Go Back</button>
+  </div>
+</body>
+</html>

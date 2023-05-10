@@ -32,7 +32,7 @@ map<unsigned int, string> addressToInsruction; //maps the address of the instruc
 map<string, unsigned int> labelToAddress; // we assume labels are case sensitive, same conventions used by RARS
 int registers[32] = {}; //registers initialized to zero
 unsigned int PC = 0; // Max PC is 2^32-1 = 4294967295
-ifstream currentFile;
+ifstream file;
 
 //Utility Funciton
 bool validFirstAddress();
@@ -131,13 +131,13 @@ int main() {
         // cout<<"The format of memory file should be on form 'address value' without quotations\n";
         // cout<<"Enter the memory file name with the extension. The file should be in the current direcory.\n";
         // openFile("Memory.txt");
-        currentFile.open("Memory.txt");
+        file.open("Memory.txt");
         unsigned int address;
         int val;
         // We assume the memory file format is on form
         // Address1 val1
         // Address2 val2 ...
-        while(currentFile>>address){
+        while(file>>address){
             if(address %4){ //we make the assumtion that all memory addresses given by user is divisible by 4
                             // for an easier loading and to make sure data is not written on top of each other
                 // TODO: send error messages from C++ to webpage OR check in python file before running the cpp file
@@ -146,13 +146,13 @@ int main() {
                 system("pause");
                 exit(1);
             }
-            currentFile >> val;
+            file >> val;
             memory[address] = val;
         }
         // for (auto it: memory){
         //     cout<<it.first<<" "<<it.second<<"\n";
         // }
-        currentFile.close();
+        file.close();
     }
     // cout << "Enter the assembly code file name with the extension. The file should be in the current direcory.\n";
     openFile("assemblyCode.txt");
@@ -185,11 +185,11 @@ int main() {
 
 
 void openFile(string fileName){
-    currentFile.open(fileName);
-    while(!currentFile.is_open()){
+    file.open(fileName);
+    while(!file.is_open()){
         cout<<"The file can not be located.\nPlease enter the name again: ";
         cin>>fileName;
-        currentFile.open(fileName);
+        file.open(fileName);
     }
 }
 
@@ -306,7 +306,7 @@ int reg_to_int(string s) {
 void mapInstructionsAndLabels(){
     unsigned int tmpPC = PC;
     string Line;
-    while(getline(currentFile, Line)){
+    while(getline(file, Line)){
         if(!Line.empty()){
             strip(Line);
             size_t colonPos = Line.find(":"); // to mark labels
