@@ -33,9 +33,11 @@ def validate_memoryFormat():
 
 
 def validate_assemblyCode():
+    errorMsg = ''
     with open('errorMessages.txt', 'r') as f:
         for line in f:
             errorMsg = line
+    logging.info(errorMsg)
     return errorMsg
 
 
@@ -61,6 +63,7 @@ def submit():
     mem_option = request.form['mem_option']
     code_option = request.form['code_option']
     format = request.form['format']
+
     if mem_init == "yes":
         if mem_option == "file":
             uploaded_file = request.files['mem_file'] # 'file' should match the name attribute of the input element
@@ -77,6 +80,8 @@ def submit():
             return redirect(url_for('display_error', 
                             error_1 = "All memory addresses given should be aligned and divisible by 4",
                             error_2 = "Please correct the initial memory values and try again."))
+        
+
     if code_option == "text":
         code_txt = request.form["code_txt"]
         with open("assemblyCode.txt", 'w') as fff:
@@ -85,6 +90,7 @@ def submit():
         uploaded_file = request.files['code_file'] # 'code_file' should match the name attribute of the input element
         if uploaded_file.filename != '':
             uploaded_file.save("assemblyCode.txt") # save the file to disk
+
     with open('data.txt', 'w') as f:
         f.write(fAddr) # input
         f.write(" ")

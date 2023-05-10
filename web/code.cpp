@@ -283,13 +283,13 @@ void output(string outputForm ){
 // map register given to its index in registers array
 // notice registers are case sensitive, so X0 is considered invalid
 int reg_to_int(string s) {
+    lower(s);
     if(regX_to_num.find(s) != regX_to_num.end())
         return regX_to_num[s];
     else if(reg_to_num.find(s) != reg_to_num.end())
         return reg_to_num[s];
     else{
-        cout<<"There is an invalid register used. The program will be terminated\n";
-        system("pause");
+        errorFile <<"There is an invalid register used. The program will be terminated\n";
         exit(1);
     }
 }
@@ -518,8 +518,7 @@ void executeInstruction(string s){
         }
     }
     else{
-        cout<<"Instructin "<<instructionWord<<" is not supported. The program will terminate\n";
-        system("pause");
+        errorFile <<"Instructin "<<instructionWord<<" is not supported. The program will terminate\n";
         exit(1);
     }
 
