@@ -46,6 +46,11 @@ def display_file():
 
 @app.route('/')
 def index():
+    # each time the home page is visited or refreshed all these files get deleted.
+    files = ['data.txt', 'Memory.txt', 'errorMessages.txt','assemblyCode.txt']
+    for file in files:
+        with open(file, 'w') as f:
+            f.truncate(0)
     return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
