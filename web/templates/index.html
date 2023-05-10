@@ -7,20 +7,20 @@
     </head>
     <body>
         <h1>Welcome to the RISC V simulator</h1>
-        <form method="POST" action="{{ url_for('submit') }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('submit') }}">
             <label for="firstAddress">Please, enter the address of the first instruction as positive decimal integer:</label>
-            <input type="number" name="firstAddress" id="firstAddress" required><br>
+            <input type="number" name="firstAddress" id="firstAddress" required min="0" max="4294967295"><br>
 
             <label>Do you want to initialize the memory with file?</label>
-            <input type="radio" name="mem_init" value="yes">Yes<br>
-            <input type="radio" name="mem_init" value="no" checked>No<br>
+            <input type="radio" name="mem_init" value="yes" checked>Yes<br>
+            <input type="radio" name="mem_init" value="no">No<br>
             <div id="mem_part">
                 <label>The format of memory file should be on form 'address value' without quotations</label>
                 <input type="radio" name="mem_option" value="text" checked>Enter a text<br>
                 <input type="radio" name="mem_option" value="file"> Upload a file (must be text file) <br><br>
                 <div id="mem_input">
                     <label>Initial Memory values:</label>
-                    <input type="text" id="data_txt" name="mem_text" required><br>
+                    <input type="text" id="data_txt" name="mem_text"><br>
                 </div>
             </div>
             

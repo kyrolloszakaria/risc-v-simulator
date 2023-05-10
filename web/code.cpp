@@ -108,27 +108,24 @@ void bgeu (int rs1, int rs2, string label);
 void bgeu (int rs1, int rs2,int offset);
 
 int main() {
-    cout<<"Welcome to the RISC V simulator\n";
-    do {
-        cout<<"Please, enter the address of the first instruction as positive decimal integer: ";
-    }while(!validFirstAddress());
+    ifstream file("data.txt"); 
+    // initialize the first address
+    int faddr;
+    file >> faddr;
+    PC=faddr;
 
+    //dbg
+    // cout << PC;
     //Initializing registers to 0
     for(int i=0;i<32;i++){
         registers[i]=0;
     }
 
-    ifstream file("data.txt"); 
     string c;
     // cout<<"Enter Y if you want to initilize the memory with file. Otherwise, Enter N\n";
     file >> c;
 
-    // TODO: VALIDATION WILL BE IN THE WEBPAGE
-    // while(c!="Y" && c!="y" && c!="N" && c!="n"){
-    //     cout<<"You entered a wrong input\n";
-    //     cout<<"Enter Y if you want to initilize the memory with file. Otherwise, Enter N\n";
-    //     cin>>c;
-    // }
+
     // TODO: This should be added in the webPage
     if (c=="yes"){
         // cout<<"The format of memory file should be on form 'address value' without quotations\n";
@@ -149,7 +146,6 @@ int main() {
                 system("pause");
                 exit(1);
             }
-
             currentFile >> val;
             memory[address] = val;
         }
@@ -158,7 +154,7 @@ int main() {
         // }
         currentFile.close();
     }
-    cout << "Enter the assembly code file name with the extension. The file should be in the current direcory.\n";
+    // cout << "Enter the assembly code file name with the extension. The file should be in the current direcory.\n";
     openFile("assemblyCode.txt");
     mapInstructionsAndLabels();
 
@@ -186,38 +182,16 @@ int main() {
 }
 
 
-//Utility functions
-bool validFirstAddress(){
-   string input;
-   cin>>input;
-   long long test=0;
-   for(char c:input){
-       if(!isdigit(c)){
-           cout<<"you entered an invalid address. Please, try agian\n";
-           return false;
-       }
-       test*=10;
-       test+=(c-'0');
-   }
-   if(test >maxPC || test<0){
-    cout<<"you entered an invalid address. Please, try agian\n";
-    return false;
-   }
-   else{
-       PC=test;
-       return true;
-   }
 
+
+void openFile(string fileName){
+    currentFile.open(fileName);
+    while(!currentFile.is_open()){
+        cout<<"The file can not be located.\nPlease enter the name again: ";
+        cin>>fileName;
+        currentFile.open(fileName);
+    }
 }
-
-// void openFile(string fileName){
-//     currentFile.open(fileName);
-//     while(!currentFile.is_open()){
-//         cout<<"The file can not be located.\nPlease enter the name again: ";
-//         cin>>fileName;
-//         currentFile.open(fileName);
-//     }
-// }
 
 void strip(string &str){
     string space = " \n\r\t\v\f";

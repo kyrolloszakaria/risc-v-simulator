@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request, redirect
 import subprocess
+import logging
+
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.INFO)
+
 
 
 app = Flask(__name__)
@@ -36,22 +41,22 @@ def submit():
         with open("assemblyCode.txt", 'w') as fff:
             fff.write(code_txt)
     else:
-        uploaded_file = request.files['code_file'] # 'file' should match the name attribute of the input element
+        uploaded_file = request.files['code_file'] # 'code_file' should match the name attribute of the input element
         if uploaded_file.filename != '':
-            uploaded_file.save(uploaded_file,"assemblyCode.txt") # save the file to disk
+            uploaded_file.save("assemblyCode.txt") # save the file to disk
     with open('data.txt', 'w') as f:
         f.write(fAddr) # input
+        f.write(" ")
         f.write(mem_init) # c
+        f.write(" ")
         f.write(format) # outputForm
 
-
-        
-            
     # Run the compiled program and wait for it to finish
-    process = subprocess.Popen('./a')
-    process.wait()
-    print("c++ program ran successfully")
-    # Redirect to output_table.html
+    # process = subprocess.Popen('./a')
+    logging.info('Running C++ program')
+    # process.wait()
+    logging.info("c++ program ran successfully")
+    # # Redirect to output_table.html
     return redirect('/output')
 
 @app.route('/output')
