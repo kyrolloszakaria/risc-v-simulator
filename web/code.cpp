@@ -261,7 +261,7 @@ int reg_to_int(string s) {
     else if(reg_to_num.find(s) != reg_to_num.end())
         return reg_to_num[s];
     else{
-        errorFile <<"You entered invalid register used. Please Try again.\n";
+        errorFile <<" You entered an invalid register (" << s << ") Please Try again.\n";
         exit(1);
     }
 }
