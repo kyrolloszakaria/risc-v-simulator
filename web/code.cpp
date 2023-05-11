@@ -38,7 +38,6 @@ ofstream errorFile;
 
 //Utility Funciton
 bool validFirstAddress();
-void openFile(string fileName); 
 void strip(string &str); //strip the string of outer spaces tabes and new lines
 string lower(string str); ///lower the string
 vector<string> getCommaSperated(string to_parse);//get comma separted values of string to_parse
@@ -119,23 +118,17 @@ int main() {
     file >> faddr;
     PC=faddr;
 
-    //dbg
-    // cout << PC;
     //Initializing registers to 0
     for(int i=0;i<32;i++){
         registers[i]=0;
     }
 
     string c;
-    // cout<<"Enter Y if you want to initilize the memory with file. Otherwise, Enter N\n";
-    file >> c;
+    file >> c; // flag to initialize the memory
 
 
     // TODO: This should be added in the webPage
     if (c=="yes"){
-        // cout<<"The format of memory file should be on form 'address value' without quotations\n";
-        // cout<<"Enter the memory file name with the extension. The file should be in the current direcory.\n";
-        // openFile("Memory.txt");
         file.open("Memory.txt");
         unsigned int address;
         int val;
@@ -146,44 +139,29 @@ int main() {
             file >> val;
             memory[address] = val;
         }
-        // for (auto it: memory){
-        //     cout<<it.first<<" "<<it.second<<"\n";
-        // }
+
         
     }
     string outputForm; // format
     file >>outputForm;
     file.close();
 
-    // cout << "Enter the assembly code file name with the extension. The file should be in the current direcory.\n";
-    openFile("assemblyCode.txt");
+    file.open("assemblyCode.txt");
     mapInstructionsAndLabels();
 
     //instruction word itslef is case insensitive
     while (lower(addressToInsruction[PC].substr(0, 5)) != "fence" && lower(addressToInsruction[PC]).substr(0,5) != "ecall"
      && lower(addressToInsruction[PC]).substr(0,6) != "ebreak") {
-        cout<<"PC is "<< dec<<PC<<"\n";
-        cout<<"Executing Instruction "<< addressToInsruction[PC]<<"\n";
+        outFile<<"PC is "<< dec<<PC<<"\n";
+        outFile<<"Executing Instruction "<< addressToInsruction[PC]<<"\n";
         executeInstruction(addressToInsruction[PC]); //changes values of registers and memory as required
         output(outputForm);
     }
 
     cout<<"Yaaaaay. Your program has finished executing.\n";
-    system("pause");
     return 0;
 }
 
-
-
-
-void openFile(string fileName){
-    file.open(fileName);
-    while(!file.is_open()){
-        cout<<"The file can not be located.\nPlease enter the name again: ";
-        cin>>fileName;
-        file.open(fileName);
-    }
-}
 
 void strip(string &str){
     string space = " \n\r\t\v\f";
@@ -225,55 +203,55 @@ bool in_range (int num , int bits)
 void output(string outputForm ){
     if(outputForm == "d" || outputForm =="D"){
         if(!memory.empty()){
-            cout<<"Printing Memory on the form Address : value\n";
+            outFile<<"Printing Memory on the form Address : value\n";
             for(auto it: memory)
-                cout<<it.first<<" : "<<it.second<<"\n";
+                outFile<<it.first<<" : "<<it.second<<"\n";
         }
         else{
-            cout<<"Memory is free\n";
+            outFile<<"Memory is free\n";
         }
 
-        cout<<"Registers values\n";
+        outFile<<"Registers values\n";
         for(int i=0; i<32;i++){
-            cout<<"Register x"<<i<<" : "<<registers[i]<<"\n";
+            outFile<<"Register x"<<i<<" : "<<registers[i]<<"\n";
         }
     }
     else if(outputForm =="h" || outputForm=="H"){
         if(!memory.empty()){
-            cout<<"Printing Memory on the form Address : value\n";
+            outFile<<"Printing Memory on the form Address : value\n";
             for(auto it: memory)
-                cout<<uppercase<<hex<<"0x" << setfill('0')<< setw(8)<<it.first<<" : "
+                outFile<<uppercase<<hex<<"0x" << setfill('0')<< setw(8)<<it.first<<" : "
                 <<"0x" << setfill('0')<< setw(8)<< it.second<<"\n";
         }
         else{
-            cout<<"Memory is free\n";
+            outFile<<"Memory is free\n";
         }
 
-        cout<<"Registers values\n";
+        outFile<<"Registers values\n";
         for(int i=0; i<32;i++){
-            cout<<"Register x"<<dec<<i<<" : "<<uppercase<<hex<< "0x" <<setfill('0')<<setw(8)<< registers[i]<<"\n";
+            outFile<<"Register x"<<dec<<i<<" : "<<uppercase<<hex<< "0x" <<setfill('0')<<setw(8)<< registers[i]<<"\n";
         }
     }
     else{//binary 
         bitset<32> num;
         if(!memory.empty()){
-            cout<<"Printing Memory on the form Address : value\n";
+            outFile<<"Printing Memory on the form Address : value\n";
             // I will print the address as decimal and value as binary in order not to have 64 bits on same line
             // Also, that makes more sense for formatting as it would be easier to read addresses.
             // We do not believe it is logical to print the addresses in binary
             for(auto it: memory){
                 num = it.second;
-                cout<<it.first<<" : "<<num<<"\n";
+                outFile<<it.first<<" : "<<num<<"\n";
             }
         }
         else{
-            cout<<"Memory is free\n";
+            outFile<<"Memory is free\n";
         }
 
-        cout<<"Registers values\n";
+        outFile<<"Registers values\n";
         for(int i=0; i<32;i++){
             num = registers[i];
-            cout<<"Register x"<<i<<" : "<<num<<"\n";
+            outFile<<"Register x"<<i<<" : "<<num<<"\n";
         }
 
     }

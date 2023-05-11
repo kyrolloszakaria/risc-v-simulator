@@ -12,9 +12,9 @@
             <input type="number" name="firstAddress" id="firstAddress" required min="0" max="4294967295"><br>
 
             <label>Do you want to initialize the memory with file?</label>
-            <input type="radio" name="mem_init" value="yes" checked>Yes<br>
-            <input type="radio" name="mem_init" value="no">No<br>
-            <div id="mem_part">
+            <input type="radio" name="mem_init" value="yes">Yes<br>
+            <input type="radio" name="mem_init" value="no" checked>No<br>
+            <div id="mem_part" class = "hidden">
                 <label>The format of memory file should be on form 'address value' without quotations</label>
                 <input type="radio" name="mem_option" value="text" checked>Enter a text<br>
                 <input type="radio" name="mem_option" value="file"> Upload a file (must be text file) <br><br>
@@ -30,10 +30,9 @@
             <input type="radio" name="code_option" value="file"> Upload code file (must be text file) <br><br>
             <div id="code_input">
                 <label>Source code: </label>
-                <input type="text" id="code_txt" name="code_txt" required><br>
+                <textarea id="code_txt" name="code_txt" oninput="autoResize()"></textarea>
             </div>
             <br>
-
             <label for="format">Which format do you want the output in? Choose 'd' for decimal, 'h' for hexadecimal, 'b' for binary</label>
             <input type="radio" name="format" id="format" value="d"checked>d<br>
             <input type="radio" name="format" id="format" value="h"checked>h<br>
@@ -52,7 +51,7 @@
                         codeInput.innerHTML = '<input type="file" name="code_file" required><br>';
                     } else {
                         codeInput.innerHTML = '<label>source code:</label>'
-                        codeInput.innerHTML += '<input type="text" id="code_txt" name="code_txt" required>';
+                        codeInput.innerHTML += '<textarea id="code_txt" name="code_txt" oninput="autoResize()"></textarea>';
                     }
                 });
             });
@@ -65,7 +64,7 @@
                         memInput.innerHTML = '<input type="file" name="mem_file" required><br>';
                     } else {
                         memInput.innerHTML = '<label>source mem:</label>'
-                        memInput.innerHTML += '<input type="text" id="mem_txt" name="mem_txt" required>';
+                        memInput.innerHTML += '<input type="text" id="mem_txt" name="mem_txt" rows="10" cols="50" required>';
                     }
                 });
             });
@@ -90,9 +89,16 @@
                 });
             });
             
+            function autoResize() {
+                // Get the textarea element
+                var textarea = document.getElementById("code_txt");
 
+                // Reset the height to its minimum value to force it to shrink
+                textarea.style.height = "auto";
 
-
+                // Set the new height based on the scroll height and border size
+                textarea.style.height = (textarea.scrollHeight + 2) + "px";
+            }
         </script>
     </body>
     </html>

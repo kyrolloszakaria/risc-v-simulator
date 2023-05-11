@@ -21,7 +21,7 @@ def validate_memoryFormat():
     with open("Memory.txt", 'r') as file:
         for line in file:
             try:
-                address, val = line.split()
+                address, val = line.split() # first check for format
                 address = int(address)
                 val = int(val)
                 if address % 4 != 0:
