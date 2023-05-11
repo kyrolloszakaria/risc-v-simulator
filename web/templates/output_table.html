@@ -12,20 +12,65 @@
             background-color: #f2f2f2;
         }
     </style>
+    <script>
+        var lines_list = '{{ lines_list }}'
+        function onNext() {
+            var currentIndex = parseInt(document.getElementById("list-index").innerHTML);
+            if (currentIndex < lines_list.length - 1) {
+                currentIndex++;
+                document.getElementById("list-index").innerHTML = currentIndex;
+                updateTable(currentIndex);
+            }
+        }
+    
+        function onPrev() {
+            var currentIndex = parseInt(document.getElementById("list-index").innerHTML);
+            if (currentIndex > 0) {
+                currentIndex--;
+                document.getElementById("list-index").innerHTML = currentIndex;
+                updateTable(currentIndex);
+            }
+        }
+    
+        function updateTable(currentIndex) {
+            var table = document.getElementById("instruction-table");
+            table.innerHTML = ""; // clear the current table rows
+            table.innerHTML
+            var lines = lines_list[currentIndex].split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                var parts = line.split(':');
+                var row = table.insertRow(i);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = parts[0];
+                cell2.innerHTML = parts[1];
+            }
+        }
+    </script>
+    
 </head>
 <body>
     <h1>Program Execution</h1>
-    <table>
+    <button class="button" onclick="onPrev()">Previous</button>
+    <button class="button" onclick="onNext()">Next</button>
+    <br>
+    <table id="instruction-table">
+        <tr>
+            <td>Line Index:</td>
+            <td id="list-index">{{ current_index }}</td>
+        </tr>
         <tr>
             <th>Instruction</th>
             <th>Value</th>
         </tr>
-        {% for line in lines %}
+        {% for line in lines_list[current_index].split('\n') %}
         <tr>
             <td>{{ line.split(':')[0] }}</td>
             <td>{{ line.split(':')[1] }}</td>
         </tr>
         {% endfor %}
     </table>
+    <br>
 </body>
 </html>

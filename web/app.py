@@ -43,8 +43,27 @@ def validate_assemblyCode():
 
 def display_file():
     with open('small_output.txt', 'r') as f:
-        lines = f.readlines()
-    return render_template('output_table.html', lines=lines)
+        text = f.read()
+    start_index = 0
+    subtexts = []
+    while True:
+        start_index = text.find("PC is", start_index)
+        if start_index == -1:
+            break
+        end_index = text.find("Register x31", start_index)
+        line_end_index = text.find("\n", end_index)
+        if line_end_index == -1:
+            subtext = text[start_index:]
+        else:
+            subtext = text[start_index:line_end_index]
+        subtexts.append(subtext)
+        start_index = line_end_index
+    return render_template('output_table.html', lines_list=subtexts, current_index = 0)
+
+def display_file_simple():
+    with open('output.txt', 'r') as f:
+        lines = f.readlines();
+    return render_template('output_table_simple.html', lines = lines)
 
 @app.route('/')
 def index():
@@ -113,7 +132,8 @@ def submit():
 @app.route('/output')
 def output():
     # Display output
-    return display_file()
+    #return display_file()
+    return display_file_simple()
 
 if __name__ == '__main__':
     app.run(debug=True)
