@@ -35,9 +35,9 @@ def validate_memoryFormat():
 def validate_assemblyCode():
     errorMsg = ''
     with open('errorMessages.txt', 'r') as f:
-        for line in f:
-            errorMsg = line
-    logging.info(errorMsg)
+        text = f.read()
+        errorMsg = text
+    logging.info(f"error: {errorMsg}")
     return errorMsg
 
 
@@ -68,6 +68,9 @@ def display_file_simple():
         for line in f:
             if line[0].isdigit():
                 instructions.append(line.strip())
+            elif line.startswith('Register x0'):
+                register_values.clear()
+                register_values.append(line.strip())
             elif line.startswith('Register'):
                 register_values.append(line.strip())
             else:
