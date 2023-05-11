@@ -2,30 +2,48 @@
 <html>
 <head>
     <title>Program Execution</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-            padding: 5px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>Program Execution</h1>
-    <table>
+    <div style="overflow: auto;">
+    <table style="float: center; width: 45%;">
         <tr>
+            <th>PC</th>
             <th>Instruction</th>
-            <th>Value</th>
         </tr>
-        {% for line in lines %}
+        {% for line in Instructions %}
         <tr>
             <td>{{ line.split(':')[0] }}</td>
             <td>{{ line.split(':')[1] }}</td>
         </tr>
         {% endfor %}
     </table>
+    <table style="float: right; width: 45%;">
+        <tr>
+            <th>Register</th>
+            <th>Value</th>
+        </tr>
+        {% for line in Registers %}
+        <tr>
+            <td>{{ line.split(':')[0] }}</td>
+            <td>{{ line.split(':')[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <table style="float:right; width: 45%;">
+        <tr>
+            <th>Memory</th>
+            <th>Value</th>
+        </tr>
+        {% for line in Memory %}
+        <tr>
+            <td>{{ line.split(':')[0] }}</td>
+            <td>{{ line.split(':')[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 </body>
 </html>

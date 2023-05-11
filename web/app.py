@@ -61,9 +61,18 @@ def display_file():
     return render_template('output_table.html', lines_list=subtexts, current_index = 0)
 
 def display_file_simple():
+    instructions = []
+    register_values = []
+    memory = []
     with open('output.txt', 'r') as f:
-        lines = f.readlines();
-    return render_template('output_table_simple.html', lines = lines)
+        for line in f:
+            if line[0].isdigit():
+                instructions.append(line.strip())
+            elif line.startswith('Register'):
+                register_values.append(line.strip())
+            else:
+                memory.append(line.strip())
+    return render_template('output_table_simple.html', Instructions = instructions, Registers = register_values, Memory = memory)
 
 @app.route('/')
 def index():

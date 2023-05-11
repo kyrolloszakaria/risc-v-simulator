@@ -93,4 +93,51 @@ body {
     background-color: #FFFFFF;
     box-shadow: 0px 0px 10px #4169E1;
   }
-  
+
+  table {
+    border-collapse: collapse;
+    margin: 20px;
+    box-shadow: 0px 0px 10px #4169E1;
+}
+
+th {
+  background-color: #4169E1;
+  color: white;
+  font-weight: bold;
+}
+
+/* Set style for table cells */
+td {
+  padding: 10px;
+  text-align: center;
+}
+
+/* Set style for the first table */
+table:nth-child(1) {
+  float: left;
+  width: 45%;
+  margin-right: 5%;
+}
+
+/* Set style for the second table */
+table:nth-child(2) {
+  float: left;
+  width: 45%;
+}
+
+/* Set style for the third table */
+table:nth-child(3) {
+  clear: both;
+  margin-top: 50px;
+  width: 100%;
+}
+
+/* Set style for odd rows in the tables */
+tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* Set style for the div container */
+div {
+  overflow: auto;
+}
