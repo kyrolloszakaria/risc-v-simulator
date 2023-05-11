@@ -2,7 +2,7 @@
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>My Flask App</title>
+        <title>RISC-V Simulator</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
@@ -20,7 +20,7 @@
                 <input type="radio" name="mem_option" value="file"> Upload a file (must be text file) <br><br>
                 <div id="mem_input">
                     <label>Initial Memory values:</label>
-                    <input type="text" id="data_txt" name="mem_text"><br>
+                    <textarea id="data_txt" name="mem_text" oninput="autoResize_2()"> </textarea>
                 </div>
             </div>
             
@@ -30,13 +30,13 @@
             <input type="radio" name="code_option" value="file"> Upload code file (must be text file) <br><br>
             <div id="code_input">
                 <label>Source code: </label>
-                <textarea id="code_txt" name="code_txt" oninput="autoResize()"></textarea>
+                <textarea id="code_txt" name="code_txt" oninput="autoResize()" required></textarea>
             </div>
             <br>
-            <label for="format">Which format do you want the output in? Choose 'd' for decimal, 'h' for hexadecimal, 'b' for binary</label>
-            <input type="radio" name="format" id="format" value="d"checked>d<br>
-            <input type="radio" name="format" id="format" value="h"checked>h<br>
-            <input type="radio" name="format" id="format" value="b"checked>b<br>
+            <label for="format">Which format do you want the output in?</label>
+            <input type="radio" name="format" id="format" value="d"checked>decimal<br>
+            <input type="radio" name="format" id="format" value="h"checked>hexadecimal<br>
+            <input type="radio" name="format" id="format" value="b"checked>binary<br>
 
             <input type="submit" value="Submit">
         </form>
@@ -51,7 +51,7 @@
                         codeInput.innerHTML = '<input type="file" name="code_file" required><br>';
                     } else {
                         codeInput.innerHTML = '<label>source code:</label>'
-                        codeInput.innerHTML += '<textarea id="code_txt" name="code_txt" oninput="autoResize()"></textarea>';
+                        codeInput.innerHTML += '<textarea id="code_txt" name="code_txt" oninput="autoResize()" required></textarea>';
                     }
                 });
             });
@@ -64,7 +64,7 @@
                         memInput.innerHTML = '<input type="file" name="mem_file" required><br>';
                     } else {
                         memInput.innerHTML = '<label>source mem:</label>'
-                        memInput.innerHTML += '<input type="text" id="mem_txt" name="mem_txt" rows="10" cols="50" required>';
+                        memInput.innerHTML += '<textarea id="data_txt" name="mem_text" oninput="autoResize_2()" required> </textarea>';
                     }
                 });
             });
@@ -91,13 +91,18 @@
             
             function autoResize() {
                 // Get the textarea element
-                var textarea = document.getElementById("code_txt");
-
+                var textarea_1 = document.getElementById("code_txt");
                 // Reset the height to its minimum value to force it to shrink
-                textarea.style.height = "auto";
+                textarea_1.style.height = "auto";
 
                 // Set the new height based on the scroll height and border size
-                textarea.style.height = (textarea.scrollHeight + 2) + "px";
+                textarea_1.style.height = (textarea_1.scrollHeight + 2) + "px";
+
+            }
+            function autoResize_2(){
+                var textarea_2 = document.getElementById("data_txt");
+                textarea_2.style.height = "auto";
+                textarea_2.style.height = (textarea_1.scrollHeight + 2) + "px";
             }
         </script>
     </body>

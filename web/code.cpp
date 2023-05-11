@@ -11,17 +11,20 @@
 using namespace std;
 typedef long long ll;
 
+// map for conventional register names 
 unordered_map<string, int> reg_to_num = {{"zero", 0}, {"ra", 1}, {"sp", 2}, {"gp", 3}, {"tp", 4}, {"t0", 5}, {"t1", 6}, {"t2", 7},
                                {"s0", 8}, {"s1", 9}, {"a0", 10}, {"a1", 11}, {"a2", 12}, {"a3", 13}, {"a4", 14}, {"a5", 15},
                                {"a6", 16}, {"a7", 17}, {"s2", 18}, {"s3", 19}, {"s4", 20}, {"s5", 21}, {"s6", 22}, {"s7", 23},
                                {"s8", 24}, {"s9", 25}, {"s10", 26}, {"s11", 27}, {"t3", 28}, {"t4", 29}, {"t5", 30}, {"t6", 31}};
+
 
 unordered_map<string, int> regX_to_num = {{"x0", 0}, {"x1", 1}, {"x2", 2}, {"x3", 3}, {"x4", 4}, {"x5", 5}, {"x6", 6}, {"x7", 7},
                                {"x8", 8}, {"x9", 9}, {"x10", 10}, {"x11", 11}, {"x12", 12}, {"x13", 13}, {"x14", 14}, {"x15", 15},
                                {"x16", 16}, {"x17", 17}, {"x18", 18}, {"x19", 19}, {"x20", 20}, {"x21", 21}, {"x22", 22}, {"x23", 23},
                                {"x24", 24}, {"x25", 25}, {"x26", 26}, {"x27", 27}, {"x28", 28}, {"x29", 29}, {"x30", 30}, {"x31", 31}};
 
-// macros
+// macros 
+//del?
 const int byte_rep = 255;
 const int half_rep = 65535;
 const unsigned int maxPC = (1ll<<32) - 1;
@@ -32,15 +35,15 @@ map<unsigned int, string> addressToInsruction; //maps the address of the instruc
 map<string, unsigned int> labelToAddress; // we assume labels are case sensitive, same conventions used by RARS
 int registers[32] = {}; //registers initialized to zero
 unsigned int PC = 0; // Max PC is 2^32-1 = 4294967295
-ifstream file;
-ofstream outFile;
-ofstream errorFile;
+ifstream file; // for any input file
+ofstream outFile; // for program output
+ofstream errorFile; // for error messages
 
 //Utility Funciton
 bool validFirstAddress();
 void strip(string &str); //strip the string of outer spaces tabes and new lines
 string lower(string str); ///lower the string
-vector<string> getCommaSperated(string to_parse);//get comma separted values of string to_parse
+vector<string> getCommaSeparated(string to_parse);//get comma separted values of string to_parse
 bool in_range (int num , int bits); //checks if num can be representes with specifiied number of bits (signed)
 
 // Logic Fucntions
@@ -109,7 +112,8 @@ void bgeu (int rs1, int rs2, string label);
 void bgeu (int rs1, int rs2,int offset);
 
 int main() {
-    file.open("data.txt");
+    // open files
+    file.open("data.txt"); // data.txt contains: First address, mem_init flag ,ouput format
     outFile.open("output.txt");
     errorFile.open("errorMessages.txt");
 
@@ -123,25 +127,20 @@ int main() {
         registers[i]=0;
     }
 
+    // flag to initialize the memory
     string c;
-    file >> c; // flag to initialize the memory
+    file >> c; 
 
-
-    // TODO: This should be added in the webPage
     if (c=="yes"){
         file.open("Memory.txt");
         unsigned int address;
         int val;
-        // We assume the memory file format is on form
-        // Address1 val1
-        // Address2 val2 ...
         while(file>>address){
             file >> val;
             memory[address] = val;
-        }
-
-        
+        }    
     }
+
     string outputForm; // format
     file >>outputForm;
     file.close();
@@ -149,11 +148,10 @@ int main() {
     file.open("assemblyCode.txt");
     mapInstructionsAndLabels();
 
-    //instruction word itslef is case insensitive
-    while (lower(addressToInsruction[PC].substr(0, 5)) != "fence" && lower(addressToInsruction[PC]).substr(0,5) != "ecall"
+    while (lower(addressToInsruction[PC]).substr(0, 5) != "fence" && lower(addressToInsruction[PC]).substr(0,5) != "ecall"
      && lower(addressToInsruction[PC]).substr(0,6) != "ebreak") {
-        outFile<<"PC is "<< dec<<PC<<"\n";
-        outFile<<"Executing Instruction "<< addressToInsruction[PC]<<"\n";
+        outFile<<"PC : " <<PC<<"\n";
+        outFile<<"Executing Instruction : "<< addressToInsruction[PC]<<"\n";
         executeInstruction(addressToInsruction[PC]); //changes values of registers and memory as required
         output(outputForm);
     }
@@ -177,10 +175,15 @@ string lower(string str){
 }
 
 //Example Input: "t0, t1, t2" => [t0, t1, t2]
-vector<string> getCommaSperated(string to_parse){
+vector<string> getCommaSeparated(string to_parse){
+    if(to_parse.length() == 0)
+    {
+        errorFile << "You entered invalid instruction, please try again.";
+        exit(1);
+    }
+    vector<string> parsedInfo;
     stringstream ss(to_parse);
     string cur;
-    vector<string> parsedInfo;
     while(getline(ss, cur, ',')){
         strip(cur);
         if(!cur.empty()){
@@ -272,7 +275,8 @@ int reg_to_int(string s) {
     }
 }
 
-
+//TODO: add to output page column for address for each instruction
+//TODO: add function to validate instruction.
 void mapInstructionsAndLabels(){
     unsigned int tmpPC = PC;
     string Line;
@@ -287,12 +291,11 @@ void mapInstructionsAndLabels(){
                 strip(label); 
                 strip(possibleInst);
                 // validate that the label does not exist
-                if(labelToAddress.find(label) != labelToAddress.end()){//Lables are case snestitive according to RARS
+                if(labelToAddress.find(label) != labelToAddress.end()){ 
                     errorFile << "Labels must be unique. The program will terminate\n";
                     exit(1);
                 }
-                if(isdigit(label[0])){ //We assume that labels do not start with integers as in RARS 
-                    //That will help us parse J and B type instrucitons, and that is what RARS does
+                if(isdigit(label[0])){
                     errorFile <<"Labels can not start with integers. The program will terminate\n";
                     exit(1);
                 }
@@ -306,6 +309,7 @@ void mapInstructionsAndLabels(){
                     tmpPC+=4;
                 }
             }
+            // if not label
             else if (Line.size()>1){
                 addressToInsruction[tmpPC] = Line;
                 if (tmpPC > maxPC-4) {
@@ -314,8 +318,6 @@ void mapInstructionsAndLabels(){
                 }
                 tmpPC+=4;
             }
-            
-
         }
     }
 }
@@ -327,19 +329,21 @@ void executeInstruction(string s){
     string instructionWord;
     ss>>instructionWord;
     strip(instructionWord);
-    instructionWord = lower(instructionWord);//instructionWords are case insensitive
-    string insructionInfo;
-    getline(ss, insructionInfo);
-    strip(insructionInfo);
+    instructionWord = lower(instructionWord);
+    string instructionInfo;
+    getline(ss, instructionInfo);
+    strip(instructionInfo);
     vector<string> infoParsed;
 
-    infoParsed = getCommaSperated(insructionInfo);
-
-    //parse instructions with paranthesis in them. That only happen in second argemnt
-    if (infoParsed[1].find('(') != string::npos){
-        infoParsed = parseParenthesis(insructionInfo);
+    infoParsed = getCommaSeparated(instructionInfo);
+    if (infoParsed.size() <= 1){
+        errorFile << "You entered invalid instruction, please try again.";
     }
-   
+
+    //parse instructions with parenthesis in them. That only happen in second argument
+    if (infoParsed[1].find('(') != string::npos){
+        infoParsed = parseParenthesis(instructionInfo);
+    }
     //R-type
     if(instructionWord == "add"){
         add(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
@@ -360,7 +364,7 @@ void executeInstruction(string s){
         sll(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
     }
     else if (instructionWord == "srl"){
-        infoParsed = getCommaSperated(insructionInfo);
+        infoParsed = getCommaSeparated(instructionInfo);
         srl(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
     }
     else if (instructionWord == "sra"){
@@ -496,7 +500,7 @@ void executeInstruction(string s){
         }
     }
     else{
-        errorFile <<"Instructin "<<instructionWord<<" is not supported. The program will terminate\n";
+        errorFile <<"Instruction "<<instructionWord<<" is not supported. The program will terminate\n";
         exit(1);
     }
 
@@ -505,7 +509,7 @@ void executeInstruction(string s){
 
 //parses the Load and Store instructions
 vector<string> parseParenthesis(string instructionInfo){
-    vector<string> InfoParsed = getCommaSperated(instructionInfo);
+    vector<string> InfoParsed = getCommaSeparated(instructionInfo);
     string imm = InfoParsed[1].substr(0, InfoParsed[1].find('('));
     strip(imm);
     if(imm.empty())
