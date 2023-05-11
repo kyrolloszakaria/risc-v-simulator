@@ -270,7 +270,7 @@ int reg_to_int(string s) {
     else if(reg_to_num.find(s) != reg_to_num.end())
         return reg_to_num[s];
     else{
-        errorFile <<"There is an invalid register used. The program will be terminated\n";
+        errorFile <<"You entered invalid register used. Please Try again.\n";
         exit(1);
     }
 }
@@ -292,18 +292,18 @@ void mapInstructionsAndLabels(){
                 strip(possibleInst);
                 // validate that the label does not exist
                 if(labelToAddress.find(label) != labelToAddress.end()){ 
-                    errorFile << "Labels must be unique. The program will terminate\n";
+                    errorFile << "You cannot define a label twice. Please try again.\n";
                     exit(1);
                 }
                 if(isdigit(label[0])){
-                    errorFile <<"Labels can not start with integers. The program will terminate\n";
+                    errorFile <<"You cannot start a label with number. Please try again.\n";
                     exit(1);
                 }
                 labelToAddress[label] = tmpPC;
                 if(possibleInst.size()>1){
                     addressToInsruction[tmpPC] = possibleInst;
                     if (tmpPC > maxPC-4) {
-                        errorFile <<"You entered too many instructions. The program will terminate\n";
+                        errorFile <<"You entered too many instructions. Please try again.\n";
                         exit(1);
                     }
                     tmpPC+=4;
@@ -313,7 +313,7 @@ void mapInstructionsAndLabels(){
             else if (Line.size()>1){
                 addressToInsruction[tmpPC] = Line;
                 if (tmpPC > maxPC-4) {
-                    errorFile <<"You entered too many instructions. The program will terminate\n";
+                    errorFile <<"You entered too many instructions. Please try again later.\n";
                     exit(1);
                 }
                 tmpPC+=4;
@@ -500,7 +500,7 @@ void executeInstruction(string s){
         }
     }
     else{
-        errorFile <<"Instruction "<<instructionWord<<" is not supported. The program will terminate\n";
+        errorFile <<"Instruction "<<instructionWord<<" is not supported. Please try again.\n";
         exit(1);
     }
 
@@ -528,7 +528,7 @@ vector<string> parseParenthesis(string instructionInfo){
 
 void checkLabelExists(string label){
     if(labelToAddress.find(label) ==labelToAddress.end()){
-        cout<<"You are trying to jump to a label that does not exist. The program will terminate\n";
+        cout<<"You are trying to jump to a label that does not exist. Please try again.\n";
         system("pause");
         exit(1);
     }
@@ -616,7 +616,7 @@ void sll (int rd, int rs1, int rs2) // unsigned
     }
     else if (registers[rs2] > 31 | registers[rs2] < 0)
     {
-        cout<<"You are trying to shift left by more than 31 bits in the sll instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift left by more than 31 bits in the sll instruction\nPlease try again.\n";
         system("pause");
         exit(1);
     }
@@ -636,7 +636,7 @@ void srl (int rd, int rs1, int rs2) // unsigned
     }
     else if (registers[rs2] > 31 | registers[rs2] < 0)
     {
-        cout<<"You are trying to shift right by more than 31 bits in the srl instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift right by more than 31 bits in the srl instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -656,7 +656,7 @@ void sra (int rd, int rs1, int rs2) // sign extend
     }
     else if (registers[rs2] > 31 | registers[rs2] < 0)
     {
-        cout<<"You are trying to shift right by more than 31 bits in the sra instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift right by more than 31 bits in the sra instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -712,7 +712,7 @@ void addi (int rd, int rs1, int imm)
     }
     else if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the addi instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the addi instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -732,7 +732,7 @@ void andi (int rd, int rs1, int imm)
     }
     else if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the andi instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the andi instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -752,7 +752,7 @@ void ori (int rd, int rs1, int imm)
     }
     else if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the ori instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the ori instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -772,7 +772,7 @@ void xori (int rd, int rs1, int imm)
     }
     else if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the xori instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the xori instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -792,7 +792,7 @@ void slli (int rd, int rs1, int imm) // unsigned
     }
     else if (imm > 31 || imm < 0)
     {
-        cout<<"You are trying to shift left by more than 31 bits in the slli instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift left by more than 31 bits in the slli instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -812,7 +812,7 @@ void srli (int rd, int rs1, int imm) // unsigned
     }
     else if (imm > 31 || imm < 0)
     {
-        cout<<"You are trying to shift right by more than 31 bits in the srli instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift right by more than 31 bits in the srli instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -832,7 +832,7 @@ void srai (int rd, int rs1, int imm) // sign extended
     }
     else if (imm > 31 | imm < 0)
     {
-        cout<<"You are trying to shift right by more than 31 bits in the srai instruction\nthe program will terminate\n";
+        cout<<"You are trying to shift right by more than 31 bits in the srai instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -852,7 +852,7 @@ void jalr (int rd, int rs1, int imm)
     }
     if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the jalr instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the jalr instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -871,7 +871,7 @@ void lw (int rd, int rs1, int imm)
     }
     if (!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the lw instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the lw instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -884,7 +884,7 @@ void lw (int rd, int rs1, int imm)
     }
     else
     {
-        cout<<"You are trying to load from a non-allocated address in the xori instruction\nthe program will terminate\n";
+        cout<<"You are trying to load from a non-allocated address in the xori instruction\nPlease try again.\n";
         system("pause");
         exit(1);
     }
@@ -909,14 +909,14 @@ void lh (int rd, int rs1, int imm)
         }
         else
         {
-            cout<<"You are trying to load from a non-allocated address in the lh instruction\nthe program will terminate\n";
+            cout<<"You are trying to load from a non-allocated address in the lh instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
     }
     else
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the lh instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the lh instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -941,14 +941,14 @@ void lb (int rd, int rs1, int imm)
         }
         else
         {
-            cout<<"You are trying to load from a non-allocated address in the lb instruction\nthe program will terminate\n";
+            cout<<"You are trying to load from a non-allocated address in the lb instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
     }
     else
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the lb instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the lb instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -973,14 +973,14 @@ void lhu (int rd, int rs1, int imm)
         }
         else
         {
-            cout<<"You are trying to load from a non-allocated address in the lhu instruction\nthe program will terminate\n";
+            cout<<"You are trying to load from a non-allocated address in the lhu instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
     }
     else
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the lhu instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the lhu instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1005,14 +1005,14 @@ void lbu (int rd, int rs1, int imm)
         }
         else
         {
-            cout<<"You are trying to load from a non-allocated address in the lbu instruction\nthe program will terminate\n";
+            cout<<"You are trying to load from a non-allocated address in the lbu instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
     }
     else
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the lbu instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the lbu instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1028,7 +1028,7 @@ void slti (int rd, int rs1, int imm)
     }
     if(!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the slti instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the slti instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1054,7 +1054,7 @@ void sltiu (int rd, int rs1, int imm)
     }
     if(!in_range(imm, 12))
     {
-        cout<<"You are trying to input more than 12 bits for immediate in the sltiu instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 12 bits for immediate in the sltiu instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1078,7 +1078,7 @@ void sw (int rs1, int rs2, int imm)
     int final_address = registers[rs2] + imm;
     if (final_address%4)
     {
-        cout<<"You are trying to store a word into an address not divisable by 4\nthe program will terminate\n";
+        cout<<"You are trying to store a word into an address not divisable by 4\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1098,7 +1098,7 @@ void sh (int rs1, int rs2, int imm)
 
     if (final_address%2)
     {
-        cout<<"You are trying to store a half word into an address not divisable by 2\nthe program will terminate\n";
+        cout<<"You are trying to store a half word into an address not divisable by 2\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1163,7 +1163,7 @@ void beq (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the beq ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the beq ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1197,7 +1197,7 @@ void bne (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the bne ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the bne ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1231,7 +1231,7 @@ void blt (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the blt ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the blt ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1265,7 +1265,7 @@ void bltu (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the bltu ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the bltu ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1299,7 +1299,7 @@ void bge (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the bge ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the bge ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1333,7 +1333,7 @@ void bgeu (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            cout<<"You are trying to input more than 12 bits for offset in the begu ver2 instruction\nthe program will terminate\n";
+            cout<<"You are trying to input more than 12 bits for offset in the begu ver2 instruction\nPlease try again.\n";
              system("pause");
             exit(1);
         }
@@ -1370,7 +1370,7 @@ void jal (int rd, int offset) // ver2 --> jump based on offset
     }
     else
     {
-        cout<<"You are trying to input more than 20 bits for offset in the jal ver2 instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 20 bits for offset in the jal ver2 instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1390,7 +1390,7 @@ void lui (int rd, int imm)
     }
     else
     {
-        cout<<"You are trying to input more than 20 bits from immidiate in the lui instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 20 bits from immidiate in the lui instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
@@ -1409,7 +1409,7 @@ void auipc(int rd, int imm)
     }
     else
     {
-        cout<<"You are trying to input more than 20 bits from immidiate in the auip instruction\nthe program will terminate\n";
+        cout<<"You are trying to input more than 20 bits from immidiate in the auip instruction\nPlease try again.\n";
          system("pause");
         exit(1);
     }
