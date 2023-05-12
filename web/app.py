@@ -82,13 +82,13 @@ def display_file_simple():
 @app.route('/')
 def index():
     # each time the home page is visited or refreshed all these files get deleted.
-    files = ['data.txt', 'Memory.txt', 'errorMessages.txt','assemblyCode.txt']
+    files = ['data.txt', 'Memory.txt', 'errorMessages.txt','assemblyCode.txt', 'output.txt']
     for file in files:
         with open(file, 'w') as f:
             f.truncate(0)
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
+@app.route('/submit', methods=['POST']) # to submit data to server
 def submit():
     # form: firstAddress >> input, , mem_init >> c, mem_text, code_txt, format >> outputForm, mem_option
     fAddr = request.form['firstAddress']

@@ -69,7 +69,7 @@ void r_instruction(string inst, int rd, int rs1, int rs2){
             {
                 registers[rd] = (unsigned int) registers[rs1] >> registers[rs2];
             }
-    } else if (inst == r_type[7]) { // sra
+    } else if (inst == r_type[7]) { // sra : used for unsigned division
         registers[rd] = registers[rs1] >> registers[rs2];
     } else if (inst == r_type[8]) { // or
         registers[rd] = registers[rs1] | registers[rs2];
@@ -82,7 +82,7 @@ void r_instruction(string inst, int rd, int rs1, int rs2){
 // check whether a number is below or equal to n bites (signed)
 bool in_range (int num , int bits)
 {
-    int maxi = (1<<(bits-1))-1;
+    int maxi = (1<<(bits-1))-1; //  Mmax value to store in n bit register
     int mini = -(1<<(bits-1));
     return (!(num > maxi || num <mini));
     
@@ -446,7 +446,8 @@ void executeInstruction(string s){
     strip(instructionInfo);
     vector<string> infoParsed;
 
-    infoParsed = getCommaSeparated(instructionInfo);
+   
+    infoParsed = getCommaSeparated(instructionInfo);  // ['t0', 't1', 't2']
     if (infoParsed.size() <= 1){
         errorFile << "You entered invalid instruction, please try again.";
     }
@@ -457,7 +458,7 @@ void executeInstruction(string s){
     }
     //R-type
     if(isFound(r_type,instructionWord))
-        r_instruction(instructionWord,reg_to_int(infoParsed[0]),reg_to_int(infoParsed[1]),reg_to_int(infoParsed[2]));
+        r_instruction(instructionWord,reg_to_int(infoParsed[0]),reg_to_int(infoParsed[1]),reg_to_int(infoParsed[2])); 
     //I type
     else if (instructionWord == "addi"){
         addi(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), stoi(infoParsed[2]));
@@ -590,6 +591,7 @@ void executeInstruction(string s){
 
 
 //parses the Load and Store instructions
+// jalr x0, 0(x1)
 vector<string> parseParenthesis(string instructionInfo){
     vector<string> InfoParsed = getCommaSeparated(instructionInfo);
     string imm = InfoParsed[1].substr(0, InfoParsed[1].find('('));
@@ -600,9 +602,9 @@ vector<string> parseParenthesis(string instructionInfo){
     secondReg.pop_back();//poping the closing paranthesis
     strip(secondReg);
 
-    InfoParsed.pop_back();
-    InfoParsed.push_back(secondReg);
-    InfoParsed.push_back(imm);
+    InfoParsed.pop_back(); // remove 0(x1)
+    InfoParsed.push_back(secondReg); // add x1
+    InfoParsed.push_back(imm); // add 0
 
     return InfoParsed;
 }
@@ -758,6 +760,7 @@ void srai (int rd, int rs1, int imm) // sign extended
     PC += 4;
 }
 
+// jalr x0, 0(x2)
 void jalr (int rd, int rs1, int imm)
 {
     if (rd != 0)
@@ -776,7 +779,7 @@ void jalr (int rd, int rs1, int imm)
     }
 }
 
-
+// lw x2, 4(x6)
 void lw (int rd, int rs1, int imm)
 {
     if (rd == 0)
@@ -785,12 +788,12 @@ void lw (int rd, int rs1, int imm)
     }
     if (!in_range(imm, 12))
     {
-        errorFile<<"You are trying to input more than 12 bits for immediate in the lw instruction\nPlease try again.\n";
+        errorFile<<"You are trying to input more than 12 bits for immediate in the (lw) instruction\nPlease try again.\n";
          
         exit(1);
     }
 
-    int address = registers[rs1] + imm;
+    int address = registers[rs1] + imm; 
 		
     if (memory.find(address) != memory.end())
     {
@@ -798,7 +801,7 @@ void lw (int rd, int rs1, int imm)
     }
     else
     {
-        errorFile<<"You are trying to load from a non-allocated address in the xori instruction\nPlease try again.\n";
+        errorFile<<"You are trying to load from a non-allocated address in the (lw) instruction\nPlease try again.\n";
         
         exit(1);
     }
@@ -815,7 +818,7 @@ void lh (int rd, int rs1, int imm)
     if (in_range(imm, 12))
     {
         int r = (registers[rs1] + imm) % 4;
-        int address = registers[rs1] + imm - r;
+        int address = registers[rs1] + imm - r; // rounding down to the nearst multiple of 4
 		
         if (memory.find(address) != memory.end())
         {
@@ -993,7 +996,6 @@ void sw (int rs1, int rs2, int imm)
     if (final_address%4)
     {
         errorFile<<"You are trying to store a word into an address not divisable by 4\nPlease try again.\n";
-         
         exit(1);
     }
     else
@@ -1013,7 +1015,6 @@ void sh (int rs1, int rs2, int imm)
     if (final_address%2)
     {
         errorFile<<"You are trying to store a half word into an address not divisable by 2\nPlease try again.\n";
-         
         exit(1);
     }
     else
@@ -1263,12 +1264,12 @@ void bgeu (int rs1, int rs2, int offset) // --> based on offset
 void jal (int rd, string label) // ver1 --> jump based on label
 {
     checkLabelExists(label);
-    if (rd != 0)
+    if (rd != 0) // because x0 is read-only register
     {
-        registers[rd] = PC + 4;
+        registers[rd] = PC + 4; // address of next instruction in the destination register
     }
 
-    PC = labelToAddress[label];
+    PC = labelToAddress[label]; // go to the address of the label
 }
 
 void jal (int rd, int offset) // --> jump based on offset
@@ -1309,7 +1310,8 @@ void lui (int rd, int imm)
     }
     PC += 4;
 }
-
+// add upper imm to pc
+// position-independent code or loading data from memory located at a fixed offset from the current code location.
 void auipc(int rd, int imm)
 {
     if (rd == 0)
