@@ -1,1 +1,0 @@
-The stringCopy function should copy second string to to the first string. 
