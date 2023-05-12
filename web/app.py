@@ -20,16 +20,18 @@ def validate_memoryFormat():
     memory = {}
     with open("Memory.txt", 'r') as file:
         for line in file:
-            try:
-                address, val = line.split() # first check for format
-                address = int(address)
-                val = int(val)
-                if address % 4 != 0:
-                    logging.info('memory wrong')
+            line.strip()
+            if line != '':
+                try:
+                    address, val = line.split() # first check for format
+                    address = int(address)
+                    val = int(val)
+                    if address % 4 != 0:
+                        logging.info('memory wrong')
+                        raise ValueError("Memory address is not divisible by 4")
+                except ValueError:
                     raise ValueError("Memory address is not divisible by 4")
-            except ValueError:
-                raise ValueError("Memory address is not divisible by 4")
-        logging.info('memory correct')
+            logging.info('memory correct')
 
 
 def validate_assemblyCode():
@@ -67,14 +69,14 @@ def display_file_simple():
     with open('output.txt', 'r') as f:
         for line in f:
             if line[0].isdigit():
-                instructions.append(line.strip())
+                memory.append(line.strip())
             elif line.startswith('Register x0'):
                 register_values.clear()
                 register_values.append(line.strip())
             elif line.startswith('Register'):
                 register_values.append(line.strip())
-            else:
-                memory.append(line.strip())
+            elif line.startswith('pc'):
+                instructions.append(line[2:])
     return render_template('output_table_simple.html', Instructions = instructions, Registers = register_values, Memory = memory)
 
 @app.route('/')
