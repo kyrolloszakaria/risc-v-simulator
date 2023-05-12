@@ -1,16 +1,26 @@
 #include <iostream>
 #include <sstream>
+#include <map>
+#include <bitset>
 using namespace std;
 
 
 int main(){
-    string s = "add x2, x1, x0";
-    stringstream ss(s);
-    string instructionWord;
-    ss>>instructionWord;
-    string instructionInfo;
-    getline(ss, instructionInfo);
+    map<unsigned int, int> memory;
+    memory.insert(make_pair(4,12));
+    memory.insert(make_pair(8,0));
+    string regFormat = "b";
+    if (regFormat == "b") {
+    // Print memory contents
+    if (!memory.empty()) {
+        for (const auto& it : memory) {
+            cout << it.first << " : " << bitset<32>(it.second) << "\n";
+        }
+    } else {
+        cout << "Memory : free\n";
+    }
 
-    cout << instructionWord << endl;
-    cout << instructionInfo << endl;
+}
+
+
 }

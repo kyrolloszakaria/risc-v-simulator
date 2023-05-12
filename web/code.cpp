@@ -7,9 +7,22 @@
 #include <map>
 #include <unordered_map>
 #include <bitset>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 typedef long long ll;
+
+//Global Variables
+ifstream file; // for any input file
+ofstream outFile; // for program output
+ofstream errorFile; // for error messages
+map<unsigned int, int> memory; // memory
+map<unsigned int, string> addressToInsruction; //maps the address of the instruction to the string representing it. for example 1-> add x1, x2, x3
+map<string, unsigned int> labelToAddress; // we assume labels are case sensitive, same conventions used by RARS
+int registers[32] = {}; //registers initialized to zero
+unsigned int PC = 0; // Max PC is 2^32-1 = 4294967295
+
 
 // map for conventional register names 
 unordered_map<string, int> reg_to_num = {{"zero", 0}, {"ra", 1}, {"sp", 2}, {"gp", 3}, {"tp", 4}, {"t0", 5}, {"t1", 6}, {"t2", 7},
@@ -23,27 +36,238 @@ unordered_map<string, int> regX_to_num = {{"x0", 0}, {"x1", 1}, {"x2", 2}, {"x3"
                                {"x16", 16}, {"x17", 17}, {"x18", 18}, {"x19", 19}, {"x20", 20}, {"x21", 21}, {"x22", 22}, {"x23", 23},
                                {"x24", 24}, {"x25", 25}, {"x26", 26}, {"x27", 27}, {"x28", 28}, {"x29", 29}, {"x30", 30}, {"x31", 31}};
 
+
+bool isFound(vector<string> data, string target) {
+    return find(data.begin(), data.end(), target) != data.end();
+}
+
+vector<string> r_type = {"add", "sub", "sll", "slt", "sltu", "xor", "srl", "sra", "or", "and"}; // 10
+void r_instruction(string inst, int rd, int rs1, int rs2){
+    if (rd == 0)
+    {
+        return;
+    }
+    if (inst == r_type[0]) { // add
+        registers[rd] = registers[rs1] + registers[rs2];
+    } else if (inst == r_type[1]) { // sub
+        registers[rd] = registers[rs1] - registers[rs2];
+    } else if (inst == r_type[2]) { // sll
+        registers[rd] = registers[rs1] << registers[rs2];
+    } else if (inst == r_type[3]) { // slt
+        registers[rd] = (registers[rs1] < registers[rs2]) ? 1 : 0;
+    } else if (inst == r_type[4]) { // sltu 
+        registers[rd] = ((unsigned int)registers[rs1] < (unsigned int)registers[rs2]) ? 1 : 0;
+    } else if (inst == r_type[5]) { // xor
+        registers[rd] = registers[rs1] ^ registers[rs2];
+    } else if (inst == r_type[6]) { // srl
+        if (registers[rs2] > 31 | registers[rs2] < 0)
+            {
+                errorFile<<"You are trying to shift right by more than 31 bits in the srl instruction\nPlease try again.\n";
+                exit(1);
+            }
+            else 
+            {
+                registers[rd] = (unsigned int) registers[rs1] >> registers[rs2];
+            }
+    } else if (inst == r_type[7]) { // sra
+        registers[rd] = registers[rs1] >> registers[rs2];
+    } else if (inst == r_type[8]) { // or
+        registers[rd] = registers[rs1] | registers[rs2];
+    } else if (inst == r_type[9]) { // and
+        registers[rd] = registers[rs1] & registers[rs2];
+    }
+    PC += 4;
+}
+
+// check whether a number is below or equal to n bites (signed)
+bool in_range (int num , int bits)
+{
+    int maxi = (1<<(bits-1))-1;
+    int mini = -(1<<(bits-1));
+    return (!(num > maxi || num <mini));
+    
+}
+
+// B-type
+vector<string> sb_type = {"beq", "bne", "blt", "bge", "bltu", "bgeu"}; // 6
+void sb_instruction_offset(string inst,int rs1, int rs2, int offset){
+    bool isError = false;
+    if (inst == sb_type[0]) { // beq
+        if (registers[rs1] == registers[rs2])
+        {
+            if (in_range(offset, 12))
+            {
+                PC = PC + 2*offset;
+            }
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    }
+    else if (inst == sb_type[1]) { // bne
+        if (registers[rs1] != registers[rs2])
+        {
+            if (in_range(offset, 12))
+            {
+                PC = PC + 2*offset;
+            }
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    }
+    else if (inst == sb_type[2]) { // blt
+        if (registers[rs1] < registers[rs2])
+        {
+            if (in_range(offset, 12))
+            {
+                PC = PC + 2*offset;
+            }
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    }
+    else if (inst == sb_type[3]) { // bge
+        if (registers[rs1] >= registers[rs2])
+        {
+            if (in_range(offset, 12))
+                PC = PC + 2*offset;
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    }
+    else if (inst == sb_type[4]) { // bltu
+        if ((unsigned int)registers[rs1] < (unsigned int)registers[rs2])
+        {
+            if (in_range(offset, 12))
+            {
+                PC = PC + 2*offset;
+            }
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    }
+    else if (inst == sb_type[5]) { // bgeu
+        if ((unsigned int)registers[rs1] >= (unsigned int)registers[rs2])
+        {
+            if (in_range(offset, 12))
+            {
+                PC = PC + 2*offset;
+            }
+            else
+                isError = true;
+        }
+        else
+        {
+            PC += 4;
+        }
+    if(isError){
+        errorFile<<"You are trying to input more than 12 bits for offset in the " << inst <<" instruction\nPlease try again.\n"; 
+        exit(1);
+    }
+}
+}
+
+void strip(string &str){
+    string space = " \n\r\t\v\f";
+    str.erase(str.find_last_not_of(space)+1); //erasing suffix space
+    str.erase(0, str.find_first_not_of(space)); //erasing prefix space
+}
+string lower(string str){
+    string ans="";
+    for (char c:str){
+        ans.push_back(tolower(c));
+    }
+    return ans;
+}
+
+//Example Input: "t0, t1, t2" => [t0, t1, t2]
+vector<string> getCommaSeparated(string to_parse){
+    vector<string> parsedInfo;
+    stringstream ss(to_parse);
+    string cur;
+    while(getline(ss, cur, ',')){
+        strip(cur);
+        if(!cur.empty()){
+            parsedInfo.push_back(cur);
+        }
+    }
+    return parsedInfo;
+}
+
+
+
+
+void printInFormat(string regFormat ){
+        if(regFormat == "b"){
+            if(!memory.empty()){
+                for(auto it: memory){
+                    outFile<<it.first<<" : "<< bitset<32>(it.second)<<"\n";
+                }
+            }
+            else{
+                outFile<<"Memory : free\n";
+        }
+        for(int i=0; i<32;i++){
+            outFile<<"Register x"<< i <<" : "<<bitset<32>(registers[i]) <<"\n";
+        }
+
+    }
+    else if(regFormat == "d"){
+        if(!memory.empty()){
+            for(auto it: memory)
+                outFile<< dec <<it.first<<" : "<< dec <<it.second<<"\n";
+        }
+        else{
+            outFile<<"Memory : free\n";
+        }
+        for(int i=0; i < 32;i++){
+            outFile<<"Register x"<< dec<< i<<" : "<< dec<<registers[i]<<"\n";
+        }
+    }
+    else if(regFormat =="h"){
+        if(!memory.empty()){
+            for(auto it: memory)
+                outFile<<uppercase<<hex<<"0x" << setfill('0')<< setw(8)<<it.first<<" : "
+                <<"0x" << setfill('0')<< setw(8)<< it.second<<"\n";
+        }
+        else{
+            outFile<<"Memory : free\n";
+        }
+        for(int i=0; i<32;i++){
+            outFile<<"Register x"<< dec <<i<<" : "<< uppercase << hex << "0x" <<setfill('0')<<setw(8)<< registers[i]<<"\n";
+        }
+    }
+}
+
 // macros 
 //del?
 const int byte_rep = 255;
 const int half_rep = 65535;
 const unsigned int maxPC = (1ll<<32) - 1;
 
-//Global Variables
-map<unsigned int, int> memory;
-map<unsigned int, string> addressToInsruction; //maps the address of the instruction to the string representing it. for example 1-> add x1, x2, x3
-map<string, unsigned int> labelToAddress; // we assume labels are case sensitive, same conventions used by RARS
-int registers[32] = {}; //registers initialized to zero
-unsigned int PC = 0; // Max PC is 2^32-1 = 4294967295
-ifstream file; // for any input file
-ofstream outFile; // for program output
-ofstream errorFile; // for error messages
+
 
 //Utility Funciton
 bool validFirstAddress();
-void strip(string &str); //strip the string of outer spaces tabes and new lines
-string lower(string str); ///lower the string
-vector<string> getCommaSeparated(string to_parse);//get comma separted values of string to_parse
 bool in_range (int num , int bits); //checks if num can be representes with specifiied number of bits (signed)
 
 // Logic Fucntions
@@ -51,22 +275,9 @@ void mapInstructionsAndLabels();//Function to popubalte addressToInsructions and
 int reg_to_int(string s); //map the register name to its index in registers
 void executeInstruction(string s);
 vector<string> parseParenthesis(string instructionInfo); //parses the Load and Store instructions
-void output(string outputForm); //prints memory and registers
 void checkLabelExists(string label);
 
 //Instructions
-// R-type
-void add (int rd, int rs1, int rs2);
-void sub (int rd, int rs1, int rs2);
-void _or (int rd, int rs1, int rs2);
-void _and (int rd, int rs1, int rs2);
-void _xor (int rd, int rs1, int rs2);
-void sll (int rd, int rs1, int rs2);
-void srl (int rd, int rs1, int rs2);
-void sra (int rd, int rs1, int rs2);
-void slt (int rd, int rs1, int rs2);
-void sltu (int rd, int rs1, int rs2);
-
 // I-type
 void addi (int rd, int rs1, int imm);
 void andi (int rd, int rs1, int imm);
@@ -97,7 +308,7 @@ void jal (int rd, int offset);
 void lui (int rd, int imm);
 void auipc (int rd, int imm);
 
-// B-type
+// SB-type
 void beq (int rs1, int rs2, string label);
 void beq (int rs1, int rs2, int offset);
 void bne (int rs1, int rs2, string label);
@@ -130,126 +341,35 @@ int main() {
     // flag to initialize the memory
     string c;
     file >> c; 
-
     if (c=="yes"){
-        file.open("Memory.txt");
+        ifstream file_2;
+        file_2.open("Memory.txt");
         unsigned int address;
         int val;
-        while(file>>address){
-            file >> val;
+        while(file_2>>address){
+            file_2 >> val;
             memory[address] = val;
         }    
     }
 
-    string outputForm; // format
-    file >>outputForm;
+    string regFormat; // format
+    file >>regFormat;
     file.close();
-
     file.open("assemblyCode.txt");
     mapInstructionsAndLabels();
-        
+
     while (lower(addressToInsruction[PC]).substr(0, 5) != "fence" && lower(addressToInsruction[PC]).substr(0,5) != "ecall"
      && lower(addressToInsruction[PC]).substr(0,6) != "ebreak") {
-        outFile<< PC<< " : " << addressToInsruction[PC] <<"\n";
+        outFile<< "pc" <<PC<< " : " << addressToInsruction[PC] <<"\n";
         executeInstruction(addressToInsruction[PC]); //changes values of registers and memory as required
-        output(outputForm);
-            
+        printInFormat(regFormat);
+
     }
     return 0;
 }
 
 
-void strip(string &str){
-    string space = " \n\r\t\v\f";
-    str.erase(str.find_last_not_of(space)+1); //erasing suffix space
-    str.erase(0, str.find_first_not_of(space)); //erasing prefix space
-}
-string lower(string str){
-    string ans="";
-    for (char c:str){
-        ans.push_back(tolower(c));
-    }
-    return ans;
-}
 
-//Example Input: "t0, t1, t2" => [t0, t1, t2]
-vector<string> getCommaSeparated(string to_parse){
-//     if(to_parse.length() == 0)
-//     {
-//         errorFile << "You entered invalid instruction, please try again.";
-//         exit(1);
-//     }
-    vector<string> parsedInfo;
-    stringstream ss(to_parse);
-    string cur;
-    while(getline(ss, cur, ',')){
-        strip(cur);
-        if(!cur.empty()){
-            parsedInfo.push_back(cur);
-        }
-    }
-    return parsedInfo;
-}
-
-
-// check whether a number is below or equal to n bites (signed)
-bool in_range (int num , int bits)
-{
-    int maxi = (1<<(bits-1))-1;
-    int mini = -(1<<(bits-1));
-    return (!(num > maxi || num <mini));
-    
-}
-
-void output(string outputForm ){
-    if(outputForm == "d" || outputForm =="D"){
-        if(!memory.empty()){
-            for(auto it: memory)
-                outFile<<it.first<<" : "<<it.second<<"\n";
-        }
-        else{
-            outFile<<"Memory is free\n";
-        }
-        for(int i=0; i < 32;i++){
-            outFile<<"Register x"<<i<<" : "<<registers[i]<<"\n";
-        }
-    }
-    else if(outputForm =="h" || outputForm=="H"){
-        if(!memory.empty()){
-            // Printing Memory on the form Address : value 
-            for(auto it: memory)
-                outFile<<uppercase<<hex<<"0x" << setfill('0')<< setw(8)<<it.first<<" : "
-                <<"0x" << setfill('0')<< setw(8)<< it.second<<"\n";
-        }
-        else{
-            outFile<<"Memory is free\n";
-        }
-        for(int i=0; i<32;i++){
-            outFile<<"Register x"<<dec<<i<<" : "<<uppercase<<hex<< "0x" <<setfill('0')<<setw(8)<< registers[i]<<"\n";
-        }
-    }
-    else{//binary 
-        bitset<32> num;
-        if(!memory.empty()){
-            // Printing Memory on the form Address : value
-            // I will print the address as decimal and value as binary in order not to have 64 bits on same line
-            // Also, that makes more sense for formatting as it would be easier to read addresses.
-            // We do not believe it is logical to print the addresses in binary
-            for(auto it: memory){
-                num = it.second;
-                outFile<<it.first<<" : "<<num<<"\n";
-            }
-        }
-        else{
-            outFile<<"Memory is free\n";
-        }
-        for(int i=0; i<32;i++){
-            num = registers[i];
-            outFile<<"Register x"<<i<<" : "<<num<<"\n";
-        }
-
-    }
-}
 
 
 // map register given to its index in registers array
@@ -336,37 +456,8 @@ void executeInstruction(string s){
         infoParsed = parseParenthesis(instructionInfo);
     }
     //R-type
-    if(instructionWord == "add"){
-        add(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "sub"){
-        sub(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "or"){
-        _or(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "and"){
-        _and(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "xor"){
-        _xor(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "sll"){
-        sll(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "srl"){
-        infoParsed = getCommaSeparated(instructionInfo);
-        srl(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "sra"){
-        sra(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "slt"){
-        slt(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
-    else if (instructionWord == "sltu"){
-        sltu(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), reg_to_int(infoParsed[2]));
-    }
+    if(isFound(r_type,instructionWord))
+        r_instruction(instructionWord,reg_to_int(infoParsed[0]),reg_to_int(infoParsed[1]),reg_to_int(infoParsed[2]));
     //I type
     else if (instructionWord == "addi"){
         addi(reg_to_int(infoParsed[0]), reg_to_int(infoParsed[1]), stoi(infoParsed[2]));
@@ -526,173 +617,6 @@ void checkLabelExists(string label){
 
 
 /////////////////////////////////////////////Definitions///////////////////////////////////////////////////////////////////
-
-// R-type
-void add (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else
-    {
-        registers[rd] = registers[rs1] + registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void sub (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else
-    {
-        registers[rd] = registers[rs1] - registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void _or (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else
-    {
-        registers[rd] = registers[rs1] | registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void _and (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else
-    {
-        registers[rd] = registers[rs1] & registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void _xor (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else
-    {
-        registers[rd] = registers[rs1] ^ registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void sll (int rd, int rs1, int rs2) // unsigned
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else if (registers[rs2] > 31 | registers[rs2] < 0)
-    {
-        errorFile<<"You are trying to shift left by more than 31 bits in the sll instruction\nPlease try again.\n";
-        
-        exit(1);
-    }
-    else
-    {
-        registers[rd] = registers[rs1] << registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void srl (int rd, int rs1, int rs2) // unsigned
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else if (registers[rs2] > 31 | registers[rs2] < 0)
-    {
-        errorFile<<"You are trying to shift right by more than 31 bits in the srl instruction\nPlease try again.\n";
-         
-        exit(1);
-    }
-    else 
-    {
-        registers[rd] = (unsigned int) registers[rs1] >> registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void sra (int rd, int rs1, int rs2) // sign extend
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    else if (registers[rs2] > 31 | registers[rs2] < 0)
-    {
-        errorFile<<"You are trying to shift right by more than 31 bits in the sra instruction\nPlease try again.\n";
-         
-        exit(1);
-    }
-    else
-    {
-        registers[rd] = registers[rs1] >> registers[rs2];
-    }
-
-    PC += 4;
-}
-
-void slt (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    if(registers[rs1] < registers[rs2])
-    {
-        registers[rd] = 1;
-    }
-    else
-    {
-        registers[rd] = 0;
-    }
-    PC += 4;
-}
-
-void sltu (int rd, int rs1, int rs2)
-{
-    if (rd == 0)
-    {
-        return;
-    }
-    if((unsigned int)registers[rs1] < (unsigned int)registers[rs2])
-    {
-        registers[rd] = 1;
-    }
-    else
-    {
-        registers[rd] = 0;
-    }
-    PC += 4;
-}
-
-
 // I-type
 void addi (int rd, int rs1, int imm)
 {
@@ -1129,7 +1053,7 @@ void sb (int rs1, int rs2, int imm)
     PC += 4;
 }
 
-// B-type
+
 void beq (int rs1, int rs2, string label) // ver1 --> based on label
 {
     checkLabelExists(label);
@@ -1143,7 +1067,7 @@ void beq (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void beq (int rs1, int rs2, int offset) // ver2 --> based on offset
+void beq (int rs1, int rs2, int offset) // --> based on offset
 {
     if (registers[rs1] == registers[rs2])
     {
@@ -1153,7 +1077,7 @@ void beq (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the beq ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the beq instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1177,7 +1101,7 @@ void bne (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void bne (int rs1, int rs2, int offset) // ver2 --> based on offset
+void bne (int rs1, int rs2, int offset) // --> based on offset
 {
     if (registers[rs1] != registers[rs2])
     {
@@ -1187,7 +1111,7 @@ void bne (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the bne ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the bne instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1211,7 +1135,7 @@ void blt (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void blt (int rs1, int rs2, int offset) // ver2 --> based on offset
+void blt (int rs1, int rs2, int offset) // --> based on offset
 {
     if (registers[rs1] < registers[rs2])
     {
@@ -1221,7 +1145,7 @@ void blt (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the blt ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the blt instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1245,7 +1169,7 @@ void bltu (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void bltu (int rs1, int rs2, int offset) // ver2 --> based on offset
+void bltu (int rs1, int rs2, int offset) // --> based on offset
 {
     if ((unsigned int)registers[rs1] < (unsigned int)registers[rs2])
     {
@@ -1255,7 +1179,7 @@ void bltu (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the bltu ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the bltu instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1279,7 +1203,7 @@ void bge (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void bge (int rs1, int rs2, int offset) // ver2 --> based on offset
+void bge (int rs1, int rs2, int offset) // --> based on offset
 {
     if (registers[rs1] >= registers[rs2])
     {
@@ -1289,7 +1213,7 @@ void bge (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the bge ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the bge instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1313,7 +1237,7 @@ void bgeu (int rs1, int rs2, string label) // ver1 --> based on label
     }
 }
 
-void bgeu (int rs1, int rs2, int offset) // ver2 --> based on offset
+void bgeu (int rs1, int rs2, int offset) // --> based on offset
 {
     if ((unsigned int)registers[rs1] >= (unsigned int)registers[rs2])
     {
@@ -1323,7 +1247,7 @@ void bgeu (int rs1, int rs2, int offset) // ver2 --> based on offset
         }
         else
         {
-            errorFile<<"You are trying to input more than 12 bits for offset in the begu ver2 instruction\nPlease try again.\n";
+            errorFile<<"You are trying to input more than 12 bits for offset in the begu instruction\nPlease try again.\n";
              
             exit(1);
         }
@@ -1347,7 +1271,7 @@ void jal (int rd, string label) // ver1 --> jump based on label
     PC = labelToAddress[label];
 }
 
-void jal (int rd, int offset) // ver2 --> jump based on offset
+void jal (int rd, int offset) // --> jump based on offset
 {
     if (rd != 0)
     {
@@ -1359,7 +1283,7 @@ void jal (int rd, int offset) // ver2 --> jump based on offset
     }
     else
     {
-        errorFile<<"You are trying to input more than 20 bits for offset in the jal ver2 instruction\nPlease try again.\n";
+        errorFile<<"You are trying to input more than 20 bits for offset in the jal instruction\nPlease try again.\n";
          
         exit(1);
     }
