@@ -20,7 +20,7 @@ def validate_memoryFormat():
     memory = {}
     with open("Memory.txt", 'r') as file:
         for line in file:
-            line.strip()
+            line = line.strip()
             if line != '':
                 try:
                     address, val = line.split() # first check for format
@@ -110,6 +110,7 @@ def submit():
         try:
             validate_memoryFormat()
         except ValueError as e:
+            logging.info("entered error handling for memory")
             return redirect(url_for('display_error', 
                             error_1 = "All memory addresses given should be aligned and divisible by 4",
                             error_2 = "Please correct the initial memory values and try again."))
