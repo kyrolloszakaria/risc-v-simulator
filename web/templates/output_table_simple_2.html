@@ -18,8 +18,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     
     // Access the values in each cell
     const instruction = cells[0].textContent;
-    const registers = cells[1].textContent.split(',').map(register => register.trim());
-    
+    const registers = cells[1].textContent.split(',')
+  .map(register => register.trim())
+  .map(register => register.replace(/\D/g, ''));    
     // Store the instruction and registers in the map
     instructionsMap.set(instruction, registers);
   }
@@ -52,6 +53,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             registerRows.forEach((registerRow, registerIndex) => {
                 const registerValue = getRegisterValue(instructionValue, index);
                 registerRow.cells[1].textContent = registerValue;
+                // Check if the current row index is greater than or equal to 32
+                if (index >= 32) {
+                    // Remove the row from the table
+                    registerRow.remove();
+                    return; // Skip processing the remaining code for this iteration
+                }
                 index++;
             });
         });
@@ -103,7 +110,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         {% endfor %}
     </table>
 
-    <table style="float:right; width: 45%;" class="map">
+    <table style="float:right; width: 45%;" class="map hidden">
         <tr>
             <th>inst</th>
             <th>regs</th>

@@ -75,9 +75,9 @@ def display_file_simple():
         for line in f:
             if line[0].isdigit():
                 memory.append(line.strip())
-            elif line.startswith('Register x0'):
-                register_values.clear()
-                register_values.append(line.strip())
+            # elif line.startswith('Register x0'):
+            #     register_values.clear()
+            #     register_values.append(line.strip())
             elif line.startswith('Register'):
                 register_values.append(line.strip())
                 val = line.strip().split(':')[1]
