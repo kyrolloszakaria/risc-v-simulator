@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response
 import subprocess
 import logging
+import json
+import html
+
 
 
 logging.basicConfig(filename='app.log', level=logging.INFO)
@@ -66,6 +69,8 @@ def display_file_simple():
     instructions = []
     register_values = []
     memory = []
+    instToRegisters = {}
+    inst = ''
     with open('output.txt', 'r') as f:
         for line in f:
             if line[0].isdigit():
@@ -75,9 +80,13 @@ def display_file_simple():
                 register_values.append(line.strip())
             elif line.startswith('Register'):
                 register_values.append(line.strip())
+                val = line.strip().split(':')[1]
+                instToRegisters[inst].append(val)
             elif line.startswith('pc'):
                 instructions.append(line[2:])
-    return render_template('output_table_simple.html', Instructions = instructions, Registers = register_values, Memory = memory)
+                inst = line[2:].split(':')[1].strip()
+                instToRegisters[inst] = []
+    return render_template('output_table_simple_2.html', Instructions = instructions, Registers = register_values, Memory = memory, instToRegistersJSON = instToRegisters)
 
 @app.route('/')
 def index():

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Program Execution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+
+window.addEventListener('DOMContentLoaded', (event) => {
+  const instructionsMap = new Map();
+  const table = document.querySelector('.map'); // Get the table element
+  const rows_2 = table.querySelectorAll('tr'); // Get all rows_2 in the table
+  
+  // Loop through each row (excluding the header row)
+  for (let i = 1; i < rows_2.length; i++) {
+    const row = rows_2[i];
+    const cells = row.querySelectorAll('td'); // Get all cells in the row
+    
+    // Access the values in each cell
+    const instruction = cells[0].textContent;
+    const registers = cells[1].textContent.split(',').map(register => register.trim());
+    
+    // Store the instruction and registers in the map
+    instructionsMap.set(instruction, registers);
+  }
+  
+  // Access and print the map entries
+  for (const [instruction, registers] of instructionsMap) {
+    console.log('Instruction:', instruction);
+    console.log('Registers:', registers);
+  }
+  
+    const rows = document.querySelectorAll('.clickable-row');
+    const registerRows = document.querySelectorAll('.register-row');
+    rows.forEach(row => {
+        row.addEventListener('click', () => {
+            // Remove highlighting from other rows
+            rows.forEach(row => {
+                row.classList.remove('highlighted-row');
+            });
+
+            // Add highlighting to clicked row
+            row.classList.add('highlighted-row');
+            // Retrieve the value of the instruction
+            const instructionValue = row.cells[1].textContent.trim(); // Remove trailing and leading spaces
+
+            // Handle row click event here
+            console.log('Instruction clicked:', instructionValue);
+
+            // Update register value table
+            let index = 0;
+            registerRows.forEach((registerRow, registerIndex) => {
+                const registerValue = getRegisterValue(instructionValue, index);
+                registerRow.cells[1].textContent = registerValue;
+                index++;
+            });
+        });
+    });
+
+    function getRegisterValue(instruction, index) {
+        return instructionsMap.get(instruction)[index];
+    }
+});
+
+</script>
+<body>
+    <h1>Program Execution</h1>
+<div style="overflow: auto;">
+    <table style="float: center; width: 45%;">
+        <tr>
+            <th>PC</th>
+            <th>Instruction</th>
+        </tr>
+        {% for line in Instructions %}
+        <tr class="clickable-row">
+            <td>{{ line.split(':')[0] }}</td>
+            <td>{{ line.split(':')[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <table style="float: right; width: 45%;">
+        <tr>
+            <th>Register</th>
+            <th>Value</th>
+        </tr>
+        {% for line in Registers %}
+        <tr class="register-row">
+            <td>{{ line.split(':')[0] }}</td>
+            <td>{{ line.split(':')[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <table style="float:right; width: 45%;">
+        <tr>
+            <th>Address</th>
+            <th>Value</th>
+        </tr>
+        {% for line in Memory %}
+        <tr>
+            <td>{{ line.split(':')[0] }}</td>
+            <td>{{ line.split(':')[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <table style="float:right; width: 45%;" class="map">
+        <tr>
+            <th>inst</th>
+            <th>regs</th>
+        </tr>
+        {% for key,value in instToRegistersJSON.items() %}
+        <tr>
+            <td>{{key}}</td>
+            <td>{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+doesn't allow characters
+values must be between 0 and 2^32 - 1
+must fill all fields
+register values
+invalid instruction
+
+backend: c++
+frontend: flask + python , (jinja2) html, css 
+
+addi x1, x0, 8
+addi x2, x0, 5
+sw x2, 0(x1)

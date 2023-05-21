@@ -4,6 +4,10 @@ body {
   h1{
     color: #4169E1;
   }
+  .clickable-row {
+    cursor: pointer;
+  }
+
   form {
     width: 50%;
     margin: 0 auto;
@@ -100,11 +104,7 @@ body {
     box-shadow: 0px 0px 10px #4169E1;
 }
 
-th {
-  background-color: #4169E1;
-  color: white;
-  font-weight: bold;
-}
+
 
 /* Set style for table cells */
 td {
@@ -137,7 +137,17 @@ tr:nth-child(odd) {
   background-color: #f2f2f2;
 }
 
+th {
+  background-color: #4169E1;
+  color: white;
+  font-weight: bold;
+}
+
 /* Set style for the div container */
 div {
   overflow: auto;
+}
+
+.highlighted-row {
+  background-color: yellow !important;
 }
